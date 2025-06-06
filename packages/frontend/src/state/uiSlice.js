@@ -3,13 +3,17 @@ import { createSlice } from '@reduxjs/toolkit';
 const initialState = {
   isMentorCreationModalOpen: false,
   isResourceUploadModalOpen: false,
+  isQuizGenerationModalOpen: false,
+  isFlashcardGenerationModalOpen: false,
   isSidebarOpen: false,
   activeTab: 'chat',
   notifications: [],
   loading: {
     global: false,
     mentorCreation: false,
-    resourceUpload: false
+    resourceUpload: false,
+    quizGeneration: false,
+    flashcardGeneration: false
   }
 };
 
@@ -34,6 +38,24 @@ const uiSlice = createSlice({
     },
     closeResourceUploadModal: (state) => {
       state.isResourceUploadModalOpen = false;
+    },
+    toggleQuizGenerationModal: (state) => {
+      state.isQuizGenerationModalOpen = !state.isQuizGenerationModalOpen;
+    },
+    openQuizGenerationModal: (state) => {
+      state.isQuizGenerationModalOpen = true;
+    },
+    closeQuizGenerationModal: (state) => {
+      state.isQuizGenerationModalOpen = false;
+    },
+    toggleFlashcardGenerationModal: (state) => {
+      state.isFlashcardGenerationModalOpen = !state.isFlashcardGenerationModalOpen;
+    },
+    openFlashcardGenerationModal: (state) => {
+      state.isFlashcardGenerationModalOpen = true;
+    },
+    closeFlashcardGenerationModal: (state) => {
+      state.isFlashcardGenerationModalOpen = false;
     },
     toggleSidebar: (state) => {
       state.isSidebarOpen = !state.isSidebarOpen;
@@ -73,6 +95,12 @@ const uiSlice = createSlice({
     setResourceUploadLoading: (state, action) => {
       state.loading.resourceUpload = action.payload;
     },
+    setQuizGenerationLoading: (state, action) => {
+      state.loading.quizGeneration = action.payload;
+    },
+    setFlashcardGenerationLoading: (state, action) => {
+      state.loading.flashcardGeneration = action.payload;
+    },
     resetUI: (state) => {
       return initialState;
     }
@@ -87,6 +115,12 @@ export const {
   toggleResourceUploadModal,
   openResourceUploadModal,
   closeResourceUploadModal,
+  toggleQuizGenerationModal,
+  openQuizGenerationModal,
+  closeQuizGenerationModal,
+  toggleFlashcardGenerationModal,
+  openFlashcardGenerationModal,
+  closeFlashcardGenerationModal,
   toggleSidebar,
   openSidebar,
   closeSidebar,
@@ -97,17 +131,23 @@ export const {
   setGlobalLoading,
   setMentorCreationLoading,
   setResourceUploadLoading,
+  setQuizGenerationLoading,
+  setFlashcardGenerationLoading,
   resetUI
 } = uiSlice.actions;
 
 // Selectors
 export const selectIsMentorCreationModalOpen = (state) => state.ui.isMentorCreationModalOpen;
 export const selectIsResourceUploadModalOpen = (state) => state.ui.isResourceUploadModalOpen;
+export const selectIsQuizGenerationModalOpen = (state) => state.ui.isQuizGenerationModalOpen;
+export const selectIsFlashcardGenerationModalOpen = (state) => state.ui.isFlashcardGenerationModalOpen;
 export const selectIsSidebarOpen = (state) => state.ui.isSidebarOpen;
 export const selectActiveTab = (state) => state.ui.activeTab;
 export const selectNotifications = (state) => state.ui.notifications;
 export const selectGlobalLoading = (state) => state.ui.loading.global;
 export const selectMentorCreationLoading = (state) => state.ui.loading.mentorCreation;
 export const selectResourceUploadLoading = (state) => state.ui.loading.resourceUpload;
+export const selectQuizGenerationLoading = (state) => state.ui.loading.quizGeneration;
+export const selectFlashcardGenerationLoading = (state) => state.ui.loading.flashcardGeneration;
 
 export default uiSlice.reducer; 

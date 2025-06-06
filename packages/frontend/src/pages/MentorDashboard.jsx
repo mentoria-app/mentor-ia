@@ -1,15 +1,19 @@
 import React, { useEffect, useRef } from 'react';
 import { useParams } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
-import { Card, Avatar, Button } from '../components/common';
+import { Card, Avatar, Button, QuizGenerationModal, FlashcardGenerationModal } from '../components/common';
 import { ResourceCard } from '../components/resources';
 import { ChatInterface } from '../components/chat';
 import { 
   selectMentorById, 
   selectActiveMentorId, 
   setActiveMentor,
-  addResourceToMentor 
-} from '../state/mentorsSlice';
+  addResourceToMentor,
+  openQuizGenerationModal,
+  openFlashcardGenerationModal,
+  selectIsQuizGenerationModalOpen,
+  selectIsFlashcardGenerationModalOpen
+} from '../state';
 
 const MentorDashboard = ({ activeTab = 'resources' }) => {
   const { mentorId } = useParams();
@@ -18,6 +22,8 @@ const MentorDashboard = ({ activeTab = 'resources' }) => {
   
   const activeMentorId = useSelector(selectActiveMentorId);
   const mentor = useSelector(state => selectMentorById(state, mentorId));
+  const isQuizModalOpen = useSelector(selectIsQuizGenerationModalOpen);
+  const isFlashcardModalOpen = useSelector(selectIsFlashcardGenerationModalOpen);
 
   useEffect(() => {
     if (mentorId && parseInt(mentorId) !== activeMentorId) {
@@ -87,6 +93,14 @@ const MentorDashboard = ({ activeTab = 'resources' }) => {
     console.log('Resource clicked:', resource);
   };
 
+  const handleOpenQuizModal = () => {
+    dispatch(openQuizGenerationModal());
+  };
+
+  const handleOpenFlashcardModal = () => {
+    dispatch(openFlashcardGenerationModal());
+  };
+
   const renderTabContent = () => {
     switch (activeTab) {
       case 'chat':
@@ -102,8 +116,11 @@ const MentorDashboard = ({ activeTab = 'resources' }) => {
               <p className="text-gray-600 mb-4">
                 Pon a prueba tus conocimientos con preguntas personalizadas
               </p>
-              <Button className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700">
-                Comenzar Quiz
+              <Button 
+                onClick={handleOpenQuizModal}
+                className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700"
+              >
+                Generar Quiz
               </Button>
             </Card>
           </div>
@@ -117,8 +134,11 @@ const MentorDashboard = ({ activeTab = 'resources' }) => {
               <p className="text-gray-600 mb-4">
                 Repasa conceptos clave con tarjetas interactivas
               </p>
-              <Button className="bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700">
-                Ver Tarjetas
+              <Button 
+                onClick={handleOpenFlashcardModal}
+                className="bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700"
+              >
+                Generar Tarjetas
               </Button>
             </Card>
           </div>
@@ -193,53 +213,59 @@ const MentorDashboard = ({ activeTab = 'resources' }) => {
   };
 
   return (
-    <div className="flex flex-col h-full">
-      <div className="flex-shrink-0 bg-gradient-to-r from-blue-500 to-blue-600 text-white p-6">
-        <div className="flex items-center space-x-4">
-          <div className="flex-shrink-0">
-            {mentor.avatarUrl ? (
-              <Avatar 
-                src={mentor.avatarUrl} 
-                size="xl" 
-                alt={mentor.name}
-                className="border-4 border-white"
-              />
-            ) : (
-              <div className={`w-16 h-16 ${mentor.color} rounded-full flex items-center justify-center border-4 border-white`}>
-                <span className="text-white text-2xl font-bold">
-                  {mentor.name.charAt(0)}
-                </span>
-              </div>
-            )}
-          </div>
+    <>
+      <div className="flex flex-col h-full">
+        <div className="flex-shrink-0 bg-gradient-to-r from-blue-500 to-blue-600 text-white p-6">
+          <div className="flex items-center space-x-4">
+            <div className="flex-shrink-0">
+              {mentor.avatarUrl ? (
+                <Avatar 
+                  src={mentor.avatarUrl} 
+                  size="xl" 
+                  alt={mentor.name}
+                  className="border-4 border-white"
+                />
+              ) : (
+                <div className={`w-16 h-16 ${mentor.color} rounded-full flex items-center justify-center border-4 border-white`}>
+                  <span className="text-white text-2xl font-bold">
+                    {mentor.name.charAt(0)}
+                  </span>
+                </div>
+              )}
+            </div>
 
-          <div className="flex-1 min-w-0">
-            <h1 className="text-2xl font-bold truncate">
-              {mentor.name}
-            </h1>
-            <p className="text-blue-100 mt-1 truncate">
-              {mentor.subject}
-            </p>
-            <p className="text-blue-200 text-sm mt-2 truncate">
-              {mentor.description}
-            </p>
-          </div>
-
-          <div className="hidden sm:flex flex-col items-end space-y-1">
-            <div className="text-right">
-              <p className="text-2xl font-bold">{mentor.resources.length}</p>
-              <p className="text-blue-200 text-sm">
-                {mentor.resources.length === 1 ? 'Recurso' : 'Recursos'}
+            <div className="flex-1 min-w-0">
+              <h1 className="text-2xl font-bold truncate">
+                {mentor.name}
+              </h1>
+              <p className="text-blue-100 mt-1 truncate">
+                {mentor.subject}
               </p>
+              <p className="text-blue-200 text-sm mt-2 truncate">
+                {mentor.description}
+              </p>
+            </div>
+
+            <div className="hidden sm:flex flex-col items-end space-y-1">
+              <div className="text-right">
+                <p className="text-2xl font-bold">{mentor.resources.length}</p>
+                <p className="text-blue-200 text-sm">
+                  {mentor.resources.length === 1 ? 'Recurso' : 'Recursos'}
+                </p>
+              </div>
             </div>
           </div>
         </div>
+
+        <div className="flex-1 overflow-hidden">
+          {renderTabContent()}
+        </div>
       </div>
 
-      <div className="flex-1 overflow-hidden">
-        {renderTabContent()}
-      </div>
-    </div>
+      {/* Modals */}
+      <QuizGenerationModal isOpen={isQuizModalOpen} />
+      <FlashcardGenerationModal isOpen={isFlashcardModalOpen} />
+    </>
   );
 };
 

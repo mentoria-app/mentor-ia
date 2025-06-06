@@ -3,6 +3,7 @@ import { useParams } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import { Card, Avatar, Button } from '../components/common';
 import { ResourceCard } from '../components/resources';
+import { ChatInterface } from '../components/chat';
 import { 
   selectMentorById, 
   selectActiveMentorId, 
@@ -15,18 +16,15 @@ const MentorDashboard = ({ activeTab = 'resources' }) => {
   const dispatch = useDispatch();
   const fileInputRef = useRef(null);
   
-  // Get mentor data from Redux store
   const activeMentorId = useSelector(selectActiveMentorId);
   const mentor = useSelector(state => selectMentorById(state, mentorId));
 
-  // Set active mentor when component mounts or mentorId changes
   useEffect(() => {
     if (mentorId && parseInt(mentorId) !== activeMentorId) {
       dispatch(setActiveMentor(parseInt(mentorId)));
     }
   }, [mentorId, activeMentorId, dispatch]);
 
-  // If mentor is not found, show error state
   if (!mentor) {
     return (
       <div className="flex flex-col items-center justify-center min-h-full p-6">
@@ -43,7 +41,6 @@ const MentorDashboard = ({ activeTab = 'resources' }) => {
   }
 
   const handleUploadResource = () => {
-    // Trigger the file input dialog
     fileInputRef.current?.click();
   };
 
@@ -52,24 +49,19 @@ const MentorDashboard = ({ activeTab = 'resources' }) => {
     if (files && files.length > 0) {
       const file = files[0];
       
-      // Create a new resource object
       const newResource = {
         title: file.name,
         type: getFileType(file),
         size: formatFileSize(file.size),
-        status: 'Pending' // Initially pending analysis
+        status: 'Pending'
       };
 
-      // Add resource to the mentor
       dispatch(addResourceToMentor({
         mentorId: mentor.id,
         resource: newResource
       }));
 
-      // Reset file input
       event.target.value = '';
-      
-      // TODO: In a real app, you would also upload the file to the server here
       console.log('File selected for upload:', file.name);
     }
   };
@@ -92,7 +84,6 @@ const MentorDashboard = ({ activeTab = 'resources' }) => {
   };
 
   const handleResourceClick = (resource) => {
-    // TODO: Implement resource viewing/editing
     console.log('Resource clicked:', resource);
   };
 
@@ -100,36 +91,12 @@ const MentorDashboard = ({ activeTab = 'resources' }) => {
     switch (activeTab) {
       case 'chat':
         return (
-          <div className="space-y-4">
-            <Card className="p-4">
-              <div className="flex items-start space-x-3">
-                <div className={`w-8 h-8 ${mentor.color} rounded-full flex items-center justify-center`}>
-                  <span className="text-white text-sm font-medium">
-                    {mentor.name.charAt(0)}
-                  </span>
-                </div>
-                <div className="flex-1">
-                  <p className="text-gray-900">
-                    ¡Hola! Soy tu mentor de {mentor.name}. ¿En qué puedo ayudarte hoy?
-                  </p>
-                  <span className="text-xs text-gray-500">Ahora</span>
-                </div>
-              </div>
-            </Card>
-            
-            <div className="bg-white rounded-lg border p-4">
-              <input 
-                type="text" 
-                placeholder="Escribe tu pregunta aquí..."
-                className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-            </div>
-          </div>
+          <ChatInterface />
         );
         
       case 'quiz':
         return (
-          <div className="space-y-4">
+          <div className="h-full overflow-y-auto p-4">
             <Card className="p-6 text-center">
               <h3 className="text-lg font-semibold mb-2">Quiz de Práctica</h3>
               <p className="text-gray-600 mb-4">
@@ -144,7 +111,7 @@ const MentorDashboard = ({ activeTab = 'resources' }) => {
         
       case 'flashcards':
         return (
-          <div className="space-y-4">
+          <div className="h-full overflow-y-auto p-4">
             <Card className="p-6 text-center">
               <h3 className="text-lg font-semibold mb-2">Tarjetas de Estudio</h3>
               <p className="text-gray-600 mb-4">
@@ -160,10 +127,8 @@ const MentorDashboard = ({ activeTab = 'resources' }) => {
       case 'resources':
       default:
         return (
-          <>
-            {/* Resource Vault Section */}
+          <div className="h-full overflow-y-auto p-4">
             <div className="space-y-4">
-              {/* Section Header */}
               <div className="flex items-center justify-between">
                 <div>
                   <h2 className="text-xl font-semibold text-gray-900">
@@ -174,7 +139,6 @@ const MentorDashboard = ({ activeTab = 'resources' }) => {
                   </p>
                 </div>
                 
-                {/* Upload Button */}
                 <Button
                   onClick={handleUploadResource}
                   className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium flex items-center space-x-2"
@@ -184,7 +148,6 @@ const MentorDashboard = ({ activeTab = 'resources' }) => {
                 </Button>
               </div>
 
-              {/* Hidden file input */}
               <input
                 type="file"
                 ref={fileInputRef}
@@ -194,7 +157,6 @@ const MentorDashboard = ({ activeTab = 'resources' }) => {
                 multiple={false}
               />
 
-              {/* Resources List */}
               {mentor.resources.length === 0 ? (
                 <Card className="p-8 text-center border-2 border-dashed border-gray-300">
                   <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -225,17 +187,15 @@ const MentorDashboard = ({ activeTab = 'resources' }) => {
                 </div>
               )}
             </div>
-          </>
+          </div>
         );
     }
   };
 
   return (
-    <div className="flex flex-col min-h-full">
-      {/* Mentor Banner */}
-      <div className="bg-gradient-to-r from-blue-500 to-blue-600 text-white p-6">
+    <div className="flex flex-col h-full">
+      <div className="flex-shrink-0 bg-gradient-to-r from-blue-500 to-blue-600 text-white p-6">
         <div className="flex items-center space-x-4">
-          {/* Mentor Avatar */}
           <div className="flex-shrink-0">
             {mentor.avatarUrl ? (
               <Avatar 
@@ -253,7 +213,6 @@ const MentorDashboard = ({ activeTab = 'resources' }) => {
             )}
           </div>
 
-          {/* Mentor Info */}
           <div className="flex-1 min-w-0">
             <h1 className="text-2xl font-bold truncate">
               {mentor.name}
@@ -266,7 +225,6 @@ const MentorDashboard = ({ activeTab = 'resources' }) => {
             </p>
           </div>
 
-          {/* Stats */}
           <div className="hidden sm:flex flex-col items-end space-y-1">
             <div className="text-right">
               <p className="text-2xl font-bold">{mentor.resources.length}</p>
@@ -278,8 +236,7 @@ const MentorDashboard = ({ activeTab = 'resources' }) => {
         </div>
       </div>
 
-      {/* Main Content */}
-      <div className="flex-1 p-4 pb-20">
+      <div className="flex-1 overflow-hidden">
         {renderTabContent()}
       </div>
     </div>

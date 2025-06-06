@@ -1,0 +1,27 @@
+version: '3.8'
+
+services:
+  # Define the backend API service
+  api:
+    # Build the image from the Dockerfile in the packages/backend directory
+    build:
+      context: ./packages/backend
+      dockerfile: Dockerfile
+    
+    # Forward the exposed port 8000 on the container to port 8000 on the host machine
+    ports:
+      - "8000:8000"
+      
+    # Mount the local app directory into the container's app directory
+    # This is CRITICAL for development: it enables hot-reloading.
+    # When you save a file locally, the change is reflected inside the container instantly.
+    volumes:
+      - ./packages/backend/app:/app/app
+      - ./packages/backend/main.py:/app/main.py
+      
+    # Load environment variables from the .env file in the backend package
+    env_file:
+      - ./packages/backend/.env
+      
+    # Override the Dockerfile's CMD to enable --reload for development
+    command: uvicorn main:app --host 0.0.0.0 --port 8000 --reload

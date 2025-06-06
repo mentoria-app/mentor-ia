@@ -25,7 +25,10 @@ const AppLayout = ({
 
       {/* Main Content Area */}
       <main className="flex-1 overflow-y-auto">
-        {children}
+        {React.isValidElement(children) 
+          ? React.cloneElement(children, { activeTab, onTabChange })
+          : children
+        }
       </main>
 
       {/* Bottom Navigation */}

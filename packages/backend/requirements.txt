@@ -5,3 +5,5 @@ supabase
 passlib[bcrypt]
 python-jose[cryptography]
 pydantic-settings
+sqlalchemy
+psycopg2-binary

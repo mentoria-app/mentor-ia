@@ -4,7 +4,7 @@ import { AppLayout } from './components/layout';
 import { Onboarding, MentorHub, MentorDashboard, Profile } from './pages';
 
 function App() {
-  const [activeTab, setActiveTab] = useState('chat');
+  const [activeTab, setActiveTab] = useState('resources');
 
   return (
     <Router>

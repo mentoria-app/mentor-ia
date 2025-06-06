@@ -166,7 +166,7 @@ const Header = ({ title, subtitle, className = '', ...props }) => {
           </div>
         </div>
         
-        {/* Placeholder for future action buttons (e.g., menu, settings) */}
+        {/* Placeholder for future action buttons */}
         <div className="flex items-center space-x-2">
           {/* Future: Menu button, settings, etc. */}
         </div>

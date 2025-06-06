@@ -10,7 +10,7 @@ import {
   addResourceToMentor 
 } from '../state/mentorsSlice';
 
-const MentorDashboard = ({ activeTab = 'chat' }) => {
+const MentorDashboard = ({ activeTab = 'resources' }) => {
   const { mentorId } = useParams();
   const dispatch = useDispatch();
   const fileInputRef = useRef(null);
@@ -157,6 +157,7 @@ const MentorDashboard = ({ activeTab = 'chat' }) => {
           </div>
         );
         
+      case 'resources':
       default:
         return (
           <>
@@ -279,10 +280,7 @@ const MentorDashboard = ({ activeTab = 'chat' }) => {
 
       {/* Main Content */}
       <div className="flex-1 p-4 pb-20">
-        {activeTab === 'chat' || activeTab === 'quiz' || activeTab === 'flashcards' 
-          ? renderTabContent() 
-          : renderTabContent()
-        }
+        {renderTabContent()}
       </div>
     </div>
   );

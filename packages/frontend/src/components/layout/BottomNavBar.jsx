@@ -2,6 +2,7 @@ import React from 'react';
 
 const BottomNavBar = ({ activeTab, onTabChange, className = '', ...props }) => {
   const navItems = [
+    { id: 'resources', label: 'Recursos', icon: '📚' },
     { id: 'chat', label: 'Chat', icon: '💬' },
     { id: 'quiz', label: 'Quiz', icon: '📝' },
     { id: 'flashcards', label: 'Flashcards', icon: '🗃️' }

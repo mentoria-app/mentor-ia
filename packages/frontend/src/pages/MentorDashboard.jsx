@@ -217,10 +217,10 @@ const MentorDashboard = ({ activeTab = 'resources' }) => {
             <h1 className="text-2xl font-bold truncate">
               {mentor.name}
             </h1>
-            <p className="text-blue-100 mt-1">
+            <p className="text-blue-100 mt-1 truncate">
               {mentor.subject}
             </p>
-            <p className="text-blue-200 text-sm mt-2">
+            <p className="text-blue-200 text-sm mt-2 truncate">
               {mentor.description}
             </p>
           </div>

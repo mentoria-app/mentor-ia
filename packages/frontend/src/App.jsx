@@ -25,7 +25,7 @@ function App() {
         
         <Route path="/mentors" element={
           <AppLayout 
-            headerTitle="Tus Mentores" 
+            headerTitle="Mis Mentores" 
             activeTab={activeTab} 
             onTabChange={setActiveTab}
             showBottomNav={false}

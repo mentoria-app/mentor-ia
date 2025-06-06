@@ -1,56 +1,115 @@
 import React from 'react';
-import { Card } from '../components/common';
+import { useNavigate } from 'react-router-dom';
+import { MentorCard } from '../components/mentors';
+import { Button } from '../components/common';
 
 const MentorHub = () => {
+  const navigate = useNavigate();
+
   // Placeholder mentor data
   const mentors = [
-    { id: 1, name: 'Matemáticas', subject: 'Álgebra y Cálculo', color: 'bg-blue-500' },
-    { id: 2, name: 'Historia', subject: 'Historia Universal', color: 'bg-green-500' },
-    { id: 3, name: 'Biología', subject: 'Biología Celular', color: 'bg-purple-500' }
+    { 
+      id: 1, 
+      name: 'Matemáticas', 
+      subject: 'Álgebra y Cálculo', 
+      color: 'bg-blue-500',
+      resourceCount: 15,
+      avatar: null
+    },
+    { 
+      id: 2, 
+      name: 'Historia', 
+      subject: 'Historia Universal', 
+      color: 'bg-green-500',
+      resourceCount: 8,
+      avatar: null
+    },
+    { 
+      id: 3, 
+      name: 'Biología', 
+      subject: 'Biología Celular', 
+      color: 'bg-purple-500',
+      resourceCount: 12,
+      avatar: null
+    },
+    { 
+      id: 4, 
+      name: 'Química', 
+      subject: 'Química Orgánica', 
+      color: 'bg-red-500',
+      resourceCount: 6,
+      avatar: null
+    },
+    { 
+      id: 5, 
+      name: 'Física', 
+      subject: 'Mecánica Clásica', 
+      color: 'bg-indigo-500',
+      resourceCount: 9,
+      avatar: null
+    }
   ];
 
+  const handleMentorClick = (mentor) => {
+    navigate(`/mentor/${mentor.id}`);
+  };
+
+  const handleCreateMentor = () => {
+    // TODO: Navigate to mentor creation page or open modal
+    console.log('Create new mentor');
+  };
+
   return (
-    <div className="p-4 space-y-6">
-      {/* Welcome Section */}
-      <div className="text-center py-6">
-        <h1 className="text-2xl font-bold text-gray-900 mb-2">
-          Tus Mentores
-        </h1>
-        <p className="text-gray-600">
-          Selecciona un mentor para continuar estudiando
-        </p>
-      </div>
-
-      {/* Mentors Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {mentors.map((mentor) => (
-          <Card key={mentor.id} className="p-4 hover:shadow-md transition-shadow cursor-pointer">
-            <div className="flex items-center space-x-3">
-              <div className={`w-12 h-12 ${mentor.color} rounded-lg flex items-center justify-center`}>
-                <span className="text-white font-bold text-lg">
-                  {mentor.name.charAt(0)}
-                </span>
-              </div>
-              <div className="flex-1">
-                <h3 className="font-semibold text-gray-900">{mentor.name}</h3>
-                <p className="text-sm text-gray-600">{mentor.subject}</p>
-              </div>
+    <div className="flex flex-col min-h-full">
+      {/* Main Content */}
+      <div className="flex-1 p-4 pb-24">
+        {/* Welcome Section */}
+        {mentors.length === 0 ? (
+          <div className="text-center py-12">
+            <div className="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <span className="text-4xl">🤖</span>
             </div>
-          </Card>
-        ))}
-      </div>
-
-      {/* Add New Mentor Button */}
-      <div className="pt-4">
-        <Card className="p-6 border-2 border-dashed border-gray-300 hover:border-blue-400 transition-colors cursor-pointer">
-          <div className="text-center">
-            <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center mx-auto mb-3">
-              <span className="text-2xl">+</span>
-            </div>
-            <h3 className="font-medium text-gray-900 mb-1">Crear Nuevo Mentor</h3>
-            <p className="text-sm text-gray-600">Agrega una nueva materia de estudio</p>
+            <h2 className="text-xl font-semibold text-gray-900 mb-2">
+              ¡Bienvenido a MentorIA!
+            </h2>
+            <p className="text-gray-600 mb-6">
+              Crea tu primer mentor para comenzar a estudiar
+            </p>
           </div>
-        </Card>
+        ) : (
+          <div className="mb-6">
+            <h2 className="text-lg font-medium text-gray-900 mb-2">
+              Tus mentores ({mentors.length})
+            </h2>
+            <p className="text-sm text-gray-600">
+              Selecciona un mentor para continuar estudiando
+            </p>
+          </div>
+        )}
+
+        {/* Mentors Grid */}
+        {mentors.length > 0 && (
+          <div className="space-y-3">
+            {mentors.map((mentor) => (
+              <MentorCard
+                key={mentor.id}
+                mentor={mentor}
+                onClick={handleMentorClick}
+              />
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* Fixed Create Button */}
+      <div className="fixed bottom-6 left-4 right-4 z-10">
+        <Button
+          onClick={handleCreateMentor}
+          className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-4 px-6 rounded-xl shadow-lg transition-colors flex items-center justify-center space-x-2"
+        >
+          <span className="text-xl">+</span>
+          <span>Crear nuevo Mentor</span>
+        </Button>
       </div>
     </div>
   );

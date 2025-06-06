@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import { AppLayout } from './components/layout';
+import { AppLayout, MentorDashboardLayout } from './components/layout';
 import { Onboarding, MentorHub, MentorDashboard, Profile } from './pages';
 
 function App() {
@@ -35,14 +35,12 @@ function App() {
         } />
         
         <Route path="/mentor/:mentorId" element={
-          <AppLayout 
-            headerTitle="Matemáticas" 
-            headerSubtitle="Tu mentor de estudio"
+          <MentorDashboardLayout 
             activeTab={activeTab} 
             onTabChange={setActiveTab}
           >
             <MentorDashboard />
-          </AppLayout>
+          </MentorDashboardLayout>
         } />
         
         <Route path="/profile" element={

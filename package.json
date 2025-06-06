@@ -1,0 +1,25 @@
+{
+  "name": "mentor-ia",
+  "version": "1.0.0",
+  "description": "AI-powered study companion for Spanish-speaking students in Latin America",
+  "private": true,
+  "type": "module",
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "dev:frontend": "cd packages/frontend && npm run dev",
+    "build:frontend": "cd packages/frontend && npm run build",
+    "dev:backend": "cd packages/backend && npm run dev",
+    "install:all": "npm install && cd packages/frontend && npm install && cd ../backend && npm install"
+  },
+  "keywords": [
+    "ai",
+    "education",
+    "react",
+    "pwa",
+    "tutoring"
+  ],
+  "author": "MentorIA Team",
+  "license": "MIT"
+}

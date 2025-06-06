@@ -21,5 +21,9 @@
     "tutoring"
   ],
   "author": "MentorIA Team",
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "@reduxjs/toolkit": "^2.8.2",
+    "react-redux": "^9.2.0"
+  }
 }

@@ -13,12 +13,12 @@ const MentorCard = ({
     subject, 
     avatar, 
     resourceCount = 0, 
-    color = 'bg-blue-500' 
+    color = 'bg-primary' 
   } = mentor || {};
 
   return (
     <Card 
-      className={`p-4 hover:shadow-md transition-shadow cursor-pointer ${className}`}
+      className={`p-4 transition-all duration-200 hover:shadow-md hover:scale-[1.02] cursor-pointer border-2 border-transparent hover:border-primary-100 ${className}`}
       onClick={() => onClick && onClick(mentor)}
       {...props}
     >
@@ -30,9 +30,10 @@ const MentorCard = ({
               src={avatar} 
               size="lg" 
               alt={name}
+              className="transition-transform duration-200"
             />
           ) : (
-            <div className={`w-16 h-16 ${color} rounded-full flex items-center justify-center`}>
+            <div className={`w-16 h-16 ${color} rounded-full flex items-center justify-center transition-transform duration-200 hover:scale-105 shadow-sm`}>
               <span className="text-white font-bold text-xl">
                 {name ? name.charAt(0).toUpperCase() : 'M'}
               </span>
@@ -42,16 +43,16 @@ const MentorCard = ({
 
         {/* Mentor Info */}
         <div className="flex-1 min-w-0">
-          <h3 className="font-semibold text-gray-900 text-lg truncate">
+          <h3 className="font-semibold text-text-primary text-lg truncate">
             {name || 'Mentor'}
           </h3>
           {subject && (
-            <p className="text-sm text-gray-600 truncate">
+            <p className="text-sm text-text-secondary truncate">
               {subject}
             </p>
           )}
           <div className="flex items-center mt-2 space-x-4">
-            <div className="flex items-center text-xs text-gray-500">
+            <div className="flex items-center text-xs text-text-secondary">
               <span className="mr-1">📚</span>
               <span>{resourceCount} recursos</span>
             </div>
@@ -59,9 +60,9 @@ const MentorCard = ({
         </div>
 
         {/* Arrow indicator */}
-        <div className="text-gray-400">
+        <div className="text-text-secondary transition-colors duration-200 group-hover:text-primary">
           <svg 
-            className="w-5 h-5" 
+            className="w-5 h-5 transition-transform duration-200 group-hover:translate-x-1" 
             fill="none" 
             stroke="currentColor" 
             viewBox="0 0 24 24"

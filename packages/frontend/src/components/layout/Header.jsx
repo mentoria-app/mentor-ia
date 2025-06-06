@@ -3,16 +3,16 @@ import React from 'react';
 const Header = ({ title = 'MentorIA', subtitle, className = '', ...props }) => {
   return (
     <header 
-      className={`bg-white shadow-sm border-b border-gray-200 px-4 py-3 ${className}`}
+      className={`bg-surface shadow-sm border-b border-gray-100 px-4 py-3 ${className}`}
       {...props}
     >
       <div className="flex items-center justify-between">
         <div className="flex-1">
-          <h1 className="text-lg font-semibold text-gray-900 truncate">
+          <h1 className="text-lg font-semibold text-text-primary truncate">
             {title}
           </h1>
           {subtitle && (
-            <p className="text-sm text-gray-600 truncate">
+            <p className="text-sm text-text-secondary truncate">
               {subtitle}
             </p>
           )}

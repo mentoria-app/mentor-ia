@@ -1,3 +1,13 @@
 @tailwind base;
 @tailwind components;
-@tailwind utilities; 
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-background text-text-primary font-sans;
+  }
+  
+  html {
+    @apply scroll-smooth;
+  }
+} 

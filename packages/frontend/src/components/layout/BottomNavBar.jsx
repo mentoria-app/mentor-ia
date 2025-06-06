@@ -15,7 +15,7 @@ const BottomNavBar = ({ activeTab, onTabChange, className = '', ...props }) => {
 
   return (
     <nav 
-      className={`bg-white border-t border-gray-200 px-4 py-2 ${className}`}
+      className={`bg-surface border-t border-gray-100 px-4 py-2 ${className}`}
       {...props}
     >
       <div className="flex items-center justify-around">
@@ -23,13 +23,13 @@ const BottomNavBar = ({ activeTab, onTabChange, className = '', ...props }) => {
           <button
             key={item.id}
             onClick={() => handleTabClick(item.id)}
-            className={`flex flex-col items-center justify-center p-2 rounded-lg transition-colors ${
+            className={`flex flex-col items-center justify-center p-2 rounded-lg transition-all duration-200 ${
               activeTab === item.id
-                ? 'text-blue-600 bg-blue-50'
-                : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
+                ? 'text-primary bg-primary-50 scale-105'
+                : 'text-text-secondary hover:text-primary hover:bg-primary-50 hover:scale-105'
             }`}
           >
-            <span className="text-xl mb-1">{item.icon}</span>
+            <span className="text-xl mb-1 transition-transform duration-200">{item.icon}</span>
             <span className="text-xs font-medium">{item.label}</span>
           </button>
         ))}

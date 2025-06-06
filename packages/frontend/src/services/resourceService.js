@@ -1,0 +1,327 @@
+// Mock resource service
+const API_DELAY = 600; // Simulate network delay
+
+// Mock file types and their properties
+const mockFileTypes = {
+  'application/pdf': { type: 'pdf', icon: '📄' },
+  'image/jpeg': { type: 'image', icon: '🖼️' },
+  'image/png': { type: 'image', icon: '🖼️' },
+  'image/gif': { type: 'image', icon: '🖼️' },
+  'video/mp4': { type: 'video', icon: '🎥' },
+  'video/avi': { type: 'video', icon: '🎥' },
+  'audio/mp3': { type: 'audio', icon: '🎵' },
+  'audio/wav': { type: 'audio', icon: '🎵' },
+  'text/plain': { type: 'text', icon: '📝' },
+  'url': { type: 'url', icon: '🔗' }
+};
+
+// Helper function to simulate file processing
+const processFile = (file) => {
+  const fileType = mockFileTypes[file.type] || { type: 'file', icon: '📎' };
+  return {
+    id: Date.now() + Math.random(),
+    title: file.name,
+    type: fileType.type,
+    size: formatFileSize(file.size),
+    uploadDate: new Date().toISOString().split('T')[0],
+    thumbnail: null,
+    url: `/mock/files/${file.name.toLowerCase().replace(/\s+/g, '-')}`,
+    originalName: file.name,
+    mimeType: file.type
+  };
+};
+
+// Helper function to format file size
+const formatFileSize = (bytes) => {
+  if (bytes === 0) return '0 Bytes';
+  const k = 1024;
+  const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+  const i = Math.floor(Math.log(bytes) / Math.log(k));
+  return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+};
+
+// Get resources for a specific mentor
+export const getResources = async (mentorId) => {
+  return new Promise((resolve, reject) => {
+    setTimeout(() => {
+      try {
+        // Mock resources based on mentorId
+        const mockResourcesMap = {
+          1: [ // Mathematics
+            {
+              id: 1,
+              title: 'Derivadas e Integrales.pdf',
+              type: 'pdf',
+              uploadDate: '2024-01-15',
+              size: '2.1 MB',
+              thumbnail: null,
+              url: '/mock/files/derivadas-integrales.pdf'
+            },
+            {
+              id: 2,
+              title: 'Ejercicios de Límites',
+              type: 'image',
+              uploadDate: '2024-01-10',
+              size: '850 KB',
+              thumbnail: null,
+              url: '/mock/files/ejercicios-limites.jpg'
+            }
+          ],
+          2: [ // History
+            {
+              id: 3,
+              title: 'Primera Guerra Mundial.pdf',
+              type: 'pdf',
+              uploadDate: '2024-01-12',
+              size: '3.2 MB',
+              thumbnail: null,
+              url: '/mock/files/primera-guerra-mundial.pdf'
+            }
+          ],
+          3: [ // Biology
+            {
+              id: 4,
+              title: 'Estructura Celular',
+              type: 'image',
+              uploadDate: '2024-01-08',
+              size: '1.2 MB',
+              thumbnail: null,
+              url: '/mock/files/estructura-celular.png'
+            },
+            {
+              id: 5,
+              title: 'Mitosis y Meiosis - YouTube',
+              type: 'url',
+              uploadDate: '2024-01-14',
+              size: null,
+              thumbnail: null,
+              url: 'https://youtube.com/watch?v=example'
+            }
+          ]
+        };
+
+        const resources = mockResourcesMap[parseInt(mentorId)] || [];
+
+        // Simulate potential error (3% chance)
+        if (Math.random() < 0.03) {
+          reject({
+            error: 'NETWORK_ERROR',
+            message: 'Error al cargar recursos. Intenta nuevamente.'
+          });
+          return;
+        }
+
+        resolve({
+          resources,
+          totalCount: resources.length,
+          mentorId: parseInt(mentorId),
+          timestamp: new Date().toISOString()
+        });
+      } catch (error) {
+        reject({
+          error: 'UNKNOWN_ERROR',
+          message: 'Error inesperado al obtener recursos'
+        });
+      }
+    }, API_DELAY);
+  });
+};
+
+// Upload a new resource to a mentor
+export const uploadResource = async (mentorId, file) => {
+  return new Promise((resolve, reject) => {
+    setTimeout(() => {
+      try {
+        // Validation
+        if (!file) {
+          reject({
+            error: 'NO_FILE',
+            message: 'No se ha seleccionado ningún archivo'
+          });
+          return;
+        }
+
+        if (!mentorId) {
+          reject({
+            error: 'NO_MENTOR_ID',
+            message: 'ID de mentor requerido'
+          });
+          return;
+        }
+
+        // File size validation (max 50MB for mock)
+        const maxSize = 50 * 1024 * 1024; // 50MB
+        if (file.size > maxSize) {
+          reject({
+            error: 'FILE_TOO_LARGE',
+            message: 'El archivo es demasiado grande. Máximo 50MB.'
+          });
+          return;
+        }
+
+        // Determine file type
+        let fileType = 'file';
+        if (file.type.startsWith('image/')) fileType = 'image';
+        else if (file.type === 'application/pdf') fileType = 'pdf';
+        else if (file.type.startsWith('video/')) fileType = 'video';
+        else if (file.type.startsWith('audio/')) fileType = 'audio';
+
+        const newResource = {
+          id: Date.now() + Math.random(),
+          title: file.name,
+          type: fileType,
+          size: formatFileSize(file.size),
+          uploadDate: new Date().toISOString().split('T')[0],
+          thumbnail: null,
+          url: `/mock/files/${file.name.toLowerCase().replace(/\s+/g, '-')}`,
+          mentorId: parseInt(mentorId)
+        };
+
+        resolve({
+          resource: newResource,
+          message: 'Archivo subido correctamente',
+          uploadedAt: new Date().toISOString()
+        });
+      } catch (error) {
+        reject({
+          error: 'UPLOAD_ERROR',
+          message: 'Error al subir el archivo'
+        });
+      }
+    }, API_DELAY + Math.random() * 1000); // Variable upload time
+  });
+};
+
+// Upload resource from URL
+export const uploadResourceFromUrl = async (mentorId, url, title) => {
+  return new Promise((resolve, reject) => {
+    setTimeout(() => {
+      try {
+        // URL validation
+        const urlPattern = /^(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)*\/?$/;
+        if (!urlPattern.test(url)) {
+          reject({
+            error: 'INVALID_URL',
+            message: 'URL no válida'
+          });
+          return;
+        }
+
+        const newResource = {
+          id: Date.now() + Math.random(),
+          title: title || url,
+          type: 'url',
+          uploadDate: new Date().toISOString().split('T')[0],
+          size: null,
+          thumbnail: null,
+          url: url,
+          mentorId: parseInt(mentorId)
+        };
+
+        resolve({
+          resource: newResource,
+          message: 'Enlace agregado correctamente',
+          uploadedAt: new Date().toISOString()
+        });
+      } catch (error) {
+        reject({
+          error: 'URL_UPLOAD_ERROR',
+          message: 'Error al agregar el enlace'
+        });
+      }
+    }, 500);
+  });
+};
+
+// Delete a resource
+export const deleteResource = async (mentorId, resourceId) => {
+  return new Promise((resolve, reject) => {
+    setTimeout(() => {
+      try {
+        resolve({
+          success: true,
+          resourceId,
+          mentorId: parseInt(mentorId),
+          message: 'Recurso eliminado correctamente',
+          deletedAt: new Date().toISOString()
+        });
+      } catch (error) {
+        reject({
+          error: 'DELETE_ERROR',
+          message: 'Error al eliminar el recurso'
+        });
+      }
+    }, 400);
+  });
+};
+
+// Get resource details
+export const getResourceDetails = async (resourceId) => {
+  return new Promise((resolve, reject) => {
+    setTimeout(() => {
+      // Mock detailed resource info
+      const mockResource = {
+        id: resourceId,
+        title: 'Documento de Ejemplo.pdf',
+        type: 'pdf',
+        size: '2.1 MB',
+        uploadDate: '2024-01-15',
+        lastAccessed: '2024-01-22',
+        downloadCount: 5,
+        thumbnail: null,
+        url: '/mock/files/documento-ejemplo.pdf',
+        metadata: {
+          author: 'Juan Pérez',
+          createdDate: '2024-01-15',
+          modifiedDate: '2024-01-20',
+          pages: 15
+        }
+      };
+
+      resolve(mockResource);
+    }, 300);
+  });
+};
+
+// Search resources across all mentors
+export const searchResources = async (query, filters = {}) => {
+  return new Promise((resolve, reject) => {
+    setTimeout(() => {
+      // Mock search results
+      const mockResults = [
+        {
+          id: 1,
+          title: 'Derivadas e Integrales.pdf',
+          type: 'pdf',
+          mentorName: 'Matemáticas',
+          mentorId: 1,
+          uploadDate: '2024-01-15',
+          relevanceScore: 0.95
+        },
+        {
+          id: 4,
+          title: 'Estructura Celular',
+          type: 'image',
+          mentorName: 'Biología',
+          mentorId: 3,
+          uploadDate: '2024-01-08',
+          relevanceScore: 0.87
+        }
+      ];
+
+      // Filter by query if provided
+      const filteredResults = query 
+        ? mockResults.filter(r => 
+            r.title.toLowerCase().includes(query.toLowerCase())
+          )
+        : mockResults;
+
+      resolve({
+        results: filteredResults,
+        totalCount: filteredResults.length,
+        query,
+        searchTime: Math.random() * 100 + 50 // Mock search time in ms
+      });
+    }, 400);
+  });
+}; 

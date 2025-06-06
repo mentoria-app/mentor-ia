@@ -8,7 +8,8 @@ const ResourceCard = ({ resource, onClick, className = '', ...props }) => {
     type,
     uploadDate,
     size,
-    thumbnail
+    thumbnail,
+    status = 'Analyzed' // Default status if not provided
   } = resource || {};
 
   const getTypeIcon = (type) => {
@@ -30,6 +31,43 @@ const ResourceCard = ({ resource, onClick, className = '', ...props }) => {
       case 'audio': return 'bg-green-100 text-green-600';
       case 'url': return 'bg-yellow-100 text-yellow-600';
       default: return 'bg-gray-100 text-gray-600';
+    }
+  };
+
+  const getStatusColor = (status) => {
+    switch (status) {
+      case 'Analyzed': return 'bg-green-100 text-green-700';
+      case 'Pending': return 'bg-yellow-100 text-yellow-700';
+      case 'Error': return 'bg-red-100 text-red-700';
+      default: return 'bg-gray-100 text-gray-700';
+    }
+  };
+
+  const formatDate = (dateString) => {
+    if (!dateString) return '';
+    
+    // If it's already a relative format (like 'hace 2 días'), return as is
+    if (dateString.includes('hace')) {
+      return `Subido ${dateString}`;
+    }
+    
+    // Otherwise, format the date
+    const date = new Date(dateString);
+    const now = new Date();
+    const diffInMs = now - date;
+    const diffInDays = Math.floor(diffInMs / (1000 * 60 * 60 * 24));
+    
+    if (diffInDays === 0) {
+      return 'Subido hoy';
+    } else if (diffInDays === 1) {
+      return 'Subido ayer';
+    } else if (diffInDays < 7) {
+      return `Subido hace ${diffInDays} días`;
+    } else if (diffInDays < 30) {
+      const weeks = Math.floor(diffInDays / 7);
+      return `Subido hace ${weeks} ${weeks === 1 ? 'semana' : 'semanas'}`;
+    } else {
+      return `Subido el ${date.toLocaleDateString('es-ES')}`;
     }
   };
 
@@ -70,10 +108,14 @@ const ResourceCard = ({ resource, onClick, className = '', ...props }) => {
                 <span className="text-xs text-gray-500">{size}</span>
               </>
             )}
+            <span className="text-gray-300">•</span>
+            <span className={`text-xs px-2 py-1 rounded-full font-medium ${getStatusColor(status)}`}>
+              {status}
+            </span>
           </div>
           {uploadDate && (
             <p className="text-xs text-gray-400 mt-1">
-              Subido {uploadDate}
+              {formatDate(uploadDate)}
             </p>
           )}
         </div>

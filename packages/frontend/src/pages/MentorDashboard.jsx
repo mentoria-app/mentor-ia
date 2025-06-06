@@ -1,60 +1,94 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { useParams } from 'react-router-dom';
+import { useSelector, useDispatch } from 'react-redux';
 import { Card, Avatar, Button } from '../components/common';
 import { ResourceCard } from '../components/resources';
+import { 
+  selectMentorById, 
+  selectActiveMentorId, 
+  setActiveMentor,
+  addResourceToMentor 
+} from '../state/mentorsSlice';
 
 const MentorDashboard = ({ activeTab = 'chat' }) => {
   const { mentorId } = useParams();
+  const dispatch = useDispatch();
+  const fileInputRef = useRef(null);
+  
+  // Get mentor data from Redux store
+  const activeMentorId = useSelector(selectActiveMentorId);
+  const mentor = useSelector(state => selectMentorById(state, mentorId));
 
-  // Placeholder mentor data - would come from API/state in real app
-  const mentor = {
-    id: mentorId,
-    name: 'Matemáticas',
-    subject: 'Álgebra y Cálculo',
-    avatar: null,
-    color: 'bg-blue-500',
-    description: 'Tu mentor especializado en matemáticas avanzadas'
-  };
-
-  // Placeholder resources data
-  const resources = [
-    {
-      id: 1,
-      title: 'Derivadas e Integrales.pdf',
-      type: 'pdf',
-      uploadDate: 'hace 2 días',
-      size: '2.1 MB',
-      thumbnail: null
-    },
-    {
-      id: 2,
-      title: 'Ejercicios de Límites',
-      type: 'image',
-      uploadDate: 'hace 1 semana',
-      size: '850 KB',
-      thumbnail: null
-    },
-    {
-      id: 3,
-      title: 'Clase de Cálculo - YouTube',
-      type: 'url',
-      uploadDate: 'hace 3 días',
-      size: null,
-      thumbnail: null
-    },
-    {
-      id: 4,
-      title: 'Fórmulas Trigonométricas.png',
-      type: 'image',
-      uploadDate: 'hace 5 días',
-      size: '1.2 MB',
-      thumbnail: null
+  // Set active mentor when component mounts or mentorId changes
+  useEffect(() => {
+    if (mentorId && parseInt(mentorId) !== activeMentorId) {
+      dispatch(setActiveMentor(parseInt(mentorId)));
     }
-  ];
+  }, [mentorId, activeMentorId, dispatch]);
+
+  // If mentor is not found, show error state
+  if (!mentor) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-full p-6">
+        <div className="text-center">
+          <h2 className="text-2xl font-semibold text-gray-900 mb-2">
+            Mentor no encontrado
+          </h2>
+          <p className="text-gray-600">
+            El mentor que estás buscando no existe o ha sido eliminado.
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   const handleUploadResource = () => {
-    // TODO: Implement upload functionality
-    console.log('Upload resource');
+    // Trigger the file input dialog
+    fileInputRef.current?.click();
+  };
+
+  const handleFileSelect = (event) => {
+    const files = event.target.files;
+    if (files && files.length > 0) {
+      const file = files[0];
+      
+      // Create a new resource object
+      const newResource = {
+        title: file.name,
+        type: getFileType(file),
+        size: formatFileSize(file.size),
+        status: 'Pending' // Initially pending analysis
+      };
+
+      // Add resource to the mentor
+      dispatch(addResourceToMentor({
+        mentorId: mentor.id,
+        resource: newResource
+      }));
+
+      // Reset file input
+      event.target.value = '';
+      
+      // TODO: In a real app, you would also upload the file to the server here
+      console.log('File selected for upload:', file.name);
+    }
+  };
+
+  const getFileType = (file) => {
+    const type = file.type;
+    if (type.includes('pdf')) return 'pdf';
+    if (type.includes('image')) return 'image';
+    if (type.includes('video')) return 'video';
+    if (type.includes('audio')) return 'audio';
+    return 'file';
+  };
+
+  const formatFileSize = (bytes) => {
+    if (bytes === 0) return '0 Bytes';
+    const k = 1024;
+    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
   };
 
   const handleResourceClick = (resource) => {
@@ -135,7 +169,7 @@ const MentorDashboard = ({ activeTab = 'chat' }) => {
                     Tus Recursos
                   </h2>
                   <p className="text-sm text-gray-600">
-                    {resources.length} {resources.length === 1 ? 'recurso subido' : 'recursos subidos'}
+                    {mentor.resources.length} {mentor.resources.length === 1 ? 'recurso subido' : 'recursos subidos'}
                   </p>
                 </div>
                 
@@ -149,8 +183,18 @@ const MentorDashboard = ({ activeTab = 'chat' }) => {
                 </Button>
               </div>
 
+              {/* Hidden file input */}
+              <input
+                type="file"
+                ref={fileInputRef}
+                onChange={handleFileSelect}
+                className="hidden"
+                accept=".pdf,.jpg,.jpeg,.png,.gif,.mp4,.mp3,.wav"
+                multiple={false}
+              />
+
               {/* Resources List */}
-              {resources.length === 0 ? (
+              {mentor.resources.length === 0 ? (
                 <Card className="p-8 text-center border-2 border-dashed border-gray-300">
                   <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
                     <span className="text-2xl">📚</span>
@@ -170,7 +214,7 @@ const MentorDashboard = ({ activeTab = 'chat' }) => {
                 </Card>
               ) : (
                 <div className="space-y-3">
-                  {resources.map((resource) => (
+                  {mentor.resources.map((resource) => (
                     <ResourceCard
                       key={resource.id}
                       resource={resource}
@@ -192,16 +236,16 @@ const MentorDashboard = ({ activeTab = 'chat' }) => {
         <div className="flex items-center space-x-4">
           {/* Mentor Avatar */}
           <div className="flex-shrink-0">
-            {mentor.avatar ? (
+            {mentor.avatarUrl ? (
               <Avatar 
-                src={mentor.avatar} 
+                src={mentor.avatarUrl} 
                 size="xl" 
                 alt={mentor.name}
                 className="border-4 border-white"
               />
             ) : (
-              <div className="w-20 h-20 bg-white bg-opacity-20 rounded-full flex items-center justify-center border-4 border-white">
-                <span className="text-white font-bold text-2xl">
+              <div className={`w-16 h-16 ${mentor.color} rounded-full flex items-center justify-center border-4 border-white`}>
+                <span className="text-white text-2xl font-bold">
                   {mentor.name.charAt(0)}
                 </span>
               </div>
@@ -213,12 +257,22 @@ const MentorDashboard = ({ activeTab = 'chat' }) => {
             <h1 className="text-2xl font-bold truncate">
               {mentor.name}
             </h1>
-            <p className="text-blue-100 text-sm">
+            <p className="text-blue-100 mt-1">
               {mentor.subject}
             </p>
-            <p className="text-blue-50 text-xs mt-1">
+            <p className="text-blue-200 text-sm mt-2">
               {mentor.description}
             </p>
+          </div>
+
+          {/* Stats */}
+          <div className="hidden sm:flex flex-col items-end space-y-1">
+            <div className="text-right">
+              <p className="text-2xl font-bold">{mentor.resources.length}</p>
+              <p className="text-blue-200 text-sm">
+                {mentor.resources.length === 1 ? 'Recurso' : 'Recursos'}
+              </p>
+            </div>
           </div>
         </div>
       </div>

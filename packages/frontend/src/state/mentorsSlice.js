@@ -16,7 +16,8 @@ const initialMentors = [
         type: 'pdf',
         uploadDate: '2024-01-15',
         size: '2.1 MB',
-        thumbnail: null
+        thumbnail: null,
+        status: 'Analyzed'
       },
       {
         id: 2,
@@ -24,7 +25,8 @@ const initialMentors = [
         type: 'image',
         uploadDate: '2024-01-10',
         size: '850 KB',
-        thumbnail: null
+        thumbnail: null,
+        status: 'Analyzed'
       }
     ]
   },
@@ -42,7 +44,8 @@ const initialMentors = [
         type: 'pdf',
         uploadDate: '2024-01-12',
         size: '3.2 MB',
-        thumbnail: null
+        thumbnail: null,
+        status: 'Analyzed'
       }
     ]
   },
@@ -60,7 +63,8 @@ const initialMentors = [
         type: 'image',
         uploadDate: '2024-01-08',
         size: '1.2 MB',
-        thumbnail: null
+        thumbnail: null,
+        status: 'Analyzed'
       },
       {
         id: 5,
@@ -68,7 +72,8 @@ const initialMentors = [
         type: 'url',
         uploadDate: '2024-01-14',
         size: null,
-        thumbnail: null
+        thumbnail: null,
+        status: 'Pending'
       }
     ]
   }

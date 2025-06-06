@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import { AppLayout, MentorDashboardLayout } from './components/layout';
+import { AppLayout } from './components/layout';
 import { Onboarding, MentorHub, MentorDashboard, Profile } from './pages';
 
 function App() {
@@ -35,12 +35,12 @@ function App() {
         } />
         
         <Route path="/mentor/:mentorId" element={
-          <MentorDashboardLayout 
+          <AppLayout 
             activeTab={activeTab} 
             onTabChange={setActiveTab}
           >
             <MentorDashboard />
-          </MentorDashboardLayout>
+          </AppLayout>
         } />
         
         <Route path="/profile" element={

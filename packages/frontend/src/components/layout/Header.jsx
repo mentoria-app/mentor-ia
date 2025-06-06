@@ -1,22 +1,32 @@
 import React, { useState } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate, useLocation, useParams } from 'react-router-dom';
+import { useSelector } from 'react-redux';
+import { selectAllMentors, selectActiveMentorId, selectMentorById } from '../../state/mentorsSlice';
 
-const Header = ({ title = 'MentorIA', subtitle, className = '', ...props }) => {
+const Header = ({ title, subtitle, className = '', ...props }) => {
   const navigate = useNavigate();
   const location = useLocation();
+  const params = useParams();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+
+  // Get mentor data from Redux store
+  const allMentors = useSelector(selectAllMentors);
+  const activeMentorId = useSelector(selectActiveMentorId);
 
   // Check if we're on a mentor dashboard page
   const isMentorDashboard = location.pathname.startsWith('/mentor/');
+  
+  // Always call useSelector, but make it return null when not needed
+  const currentMentor = useSelector(state => {
+    if (isMentorDashboard && params.mentorId) {
+      return selectMentorById(state, params.mentorId);
+    }
+    return null;
+  });
 
-  // Placeholder mentor data for quick switcher
-  const availableMentors = [
-    { id: 1, name: 'Matemáticas', color: 'bg-primary' },
-    { id: 2, name: 'Historia', color: 'bg-secondary' },
-    { id: 3, name: 'Biología', color: 'bg-purple-500' },
-    { id: 4, name: 'Química', color: 'bg-red-500' },
-    { id: 5, name: 'Física', color: 'bg-indigo-500' },
-  ];
+  // Determine the actual title and subtitle to display
+  const displayTitle = title || (currentMentor ? currentMentor.name : 'MentorIA');
+  const displaySubtitle = subtitle || (currentMentor ? currentMentor.subject : undefined);
 
   const handleBackClick = () => {
     navigate('/mentors');
@@ -64,11 +74,11 @@ const Header = ({ title = 'MentorIA', subtitle, className = '', ...props }) => {
           <div className="flex-1 min-w-0">
             <div className="flex items-center space-x-2">
               <h1 className="text-lg font-semibold text-text-primary truncate">
-                {title}
+                {displayTitle}
               </h1>
               
               {/* Quick Mentor Switcher - Only show on MentorDashboard */}
-              {isMentorDashboard && (
+              {isMentorDashboard && allMentors.length > 1 && (
                 <div className="relative">
                   <button
                     onClick={toggleDropdown}
@@ -99,19 +109,31 @@ const Header = ({ title = 'MentorIA', subtitle, className = '', ...props }) => {
                       />
                       
                       {/* Dropdown Content */}
-                      <div className="absolute top-full left-0 mt-1 w-48 bg-surface border border-gray-200 rounded-lg shadow-lg z-20 animate-fade-in">
+                      <div className="absolute top-full left-0 mt-1 w-64 bg-surface border border-gray-200 rounded-lg shadow-lg z-20 animate-fade-in">
                         <div className="py-2">
                           <div className="px-3 py-2 text-xs font-medium text-text-secondary uppercase tracking-wide border-b border-gray-100">
                             Cambiar mentor
                           </div>
-                          {availableMentors.map((mentor) => (
+                          {allMentors.map((mentor) => (
                             <button
                               key={mentor.id}
                               onClick={() => handleMentorSwitch(mentor.id)}
-                              className="w-full flex items-center px-3 py-2 text-sm text-text-primary hover:bg-primary-50 hover:text-primary transition-colors duration-150"
+                              className={`w-full flex items-center px-3 py-2 text-sm transition-colors duration-150 ${
+                                activeMentorId === mentor.id 
+                                  ? 'bg-primary-50 text-primary border-r-2 border-primary' 
+                                  : 'text-text-primary hover:bg-primary-50 hover:text-primary'
+                              }`}
                             >
                               <div className={`w-3 h-3 ${mentor.color} rounded-full mr-3 flex-shrink-0`} />
-                              <span className="truncate">{mentor.name}</span>
+                              <div className="flex-1 text-left">
+                                <div className="font-medium truncate">{mentor.name}</div>
+                                <div className="text-xs text-text-secondary truncate">{mentor.subject}</div>
+                              </div>
+                              {activeMentorId === mentor.id && (
+                                <svg className="w-4 h-4 text-primary ml-2" fill="currentColor" viewBox="0 0 20 20">
+                                  <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                                </svg>
+                              )}
                             </button>
                           ))}
                           <div className="border-t border-gray-100 mt-1 pt-1">
@@ -136,9 +158,9 @@ const Header = ({ title = 'MentorIA', subtitle, className = '', ...props }) => {
               )}
             </div>
             
-            {subtitle && (
+            {displaySubtitle && (
               <p className="text-sm text-text-secondary truncate">
-                {subtitle}
+                {displaySubtitle}
               </p>
             )}
           </div>

@@ -15,6 +15,7 @@ export {
   fetchMentors,
   createMentor,
   fetchResourcesForMentor,
+  uploadResource,
   selectAllMentors,
   selectActiveMentorId,
   selectActiveMentor,

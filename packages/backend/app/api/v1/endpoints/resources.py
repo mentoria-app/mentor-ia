@@ -80,17 +80,17 @@ async def upload_resource_file(
         
         # Upload to Supabase Storage
         client = supabase()
-        storage_response = client.storage.from_("resources").upload(
-            path=storage_path,
-            file=file_content,
-            file_options={
-                "content-type": file_mimetype,
-                "upsert": False
-            }
-        )
-        
-        if storage_response.get('error'):
-            raise Exception(f"Storage upload failed: {storage_response['error']}")
+        try:
+            storage_response = client.storage.from_("resources").upload(
+                path=storage_path,
+                file=file_content,
+                file_options={
+                    "content-type": file_mimetype,
+                    "upsert": False
+                }
+            )
+        except Exception as storage_error:
+            raise Exception(f"Storage upload failed: {str(storage_error)}")
         
         # Get the public URL for the uploaded file
         public_url_response = client.storage.from_("resources").get_public_url(storage_path)

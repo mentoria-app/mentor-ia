@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import { Card, Avatar, Button, QuizGenerationModal, FlashcardGenerationModal } from '../components/common';
@@ -8,9 +8,12 @@ import {
   selectMentorById, 
   selectActiveMentorId, 
   selectMentorsLoading,
+  selectMentorsError,
   setActiveMentor,
   addResourceToMentor,
   fetchResourcesForMentor,
+  uploadResource,
+  addNotification,
   openQuizGenerationModal,
   openFlashcardGenerationModal,
   selectIsQuizGenerationModalOpen,
@@ -21,10 +24,12 @@ const MentorDashboard = ({ activeTab = 'resources' }) => {
   const { mentorId } = useParams();
   const dispatch = useDispatch();
   const fileInputRef = useRef(null);
+  const [isUploading, setIsUploading] = useState(false);
   
   const activeMentorId = useSelector(selectActiveMentorId);
   const mentor = useSelector(state => selectMentorById(state, mentorId));
   const loading = useSelector(selectMentorsLoading);
+  const error = useSelector(selectMentorsError);
   const isQuizModalOpen = useSelector(selectIsQuizGenerationModalOpen);
   const isFlashcardModalOpen = useSelector(selectIsFlashcardGenerationModalOpen);
 
@@ -63,43 +68,35 @@ const MentorDashboard = ({ activeTab = 'resources' }) => {
     fileInputRef.current?.click();
   };
 
-  const handleFileSelect = (event) => {
+  const handleFileSelect = async (event) => {
     const files = event.target.files;
     if (files && files.length > 0) {
       const file = files[0];
       
-      const newResource = {
-        title: file.name,
-        type: getFileType(file),
-        size: formatFileSize(file.size),
-        status: 'Pending'
-      };
-
-      dispatch(addResourceToMentor({
-        mentorId: mentor.id,
-        resource: newResource
-      }));
-
-      event.target.value = '';
-      console.log('File selected for upload:', file.name);
+      setIsUploading(true);
+      
+      try {
+        await dispatch(uploadResource({ 
+          mentorId: mentor.id, 
+          file 
+        })).unwrap();
+        
+        // Show success notification
+        dispatch(addNotification({
+          type: 'success',
+          title: 'Archivo subido exitosamente',
+          message: `${file.name} se ha subido correctamente y está siendo procesado.`
+        }));
+        
+        console.log('File uploaded successfully:', file.name);
+      } catch (error) {
+        console.error('Error uploading file:', error);
+        // Error is already handled by the Redux error state
+      } finally {
+        setIsUploading(false);
+        event.target.value = ''; // Reset file input
+      }
     }
-  };
-
-  const getFileType = (file) => {
-    const type = file.type;
-    if (type.includes('pdf')) return 'pdf';
-    if (type.includes('image')) return 'image';
-    if (type.includes('video')) return 'video';
-    if (type.includes('audio')) return 'audio';
-    return 'file';
-  };
-
-  const formatFileSize = (bytes) => {
-    if (bytes === 0) return '0 Bytes';
-    const k = 1024;
-    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
-    const i = Math.floor(Math.log(bytes) / Math.log(k));
-    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
   };
 
   const handleResourceClick = (resource) => {
@@ -174,12 +171,38 @@ const MentorDashboard = ({ activeTab = 'resources' }) => {
                 
                 <Button
                   onClick={handleUploadResource}
-                  className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium flex items-center space-x-2"
+                  disabled={isUploading}
+                  className="bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 disabled:cursor-not-allowed text-white px-4 py-2 rounded-lg font-medium flex items-center space-x-2"
                 >
-                  <span>+</span>
-                  <span>Subir Recurso</span>
+                  {isUploading ? (
+                    <>
+                      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                      <span>Subiendo...</span>
+                    </>
+                  ) : (
+                    <>
+                      <span>+</span>
+                      <span>Subir Recurso</span>
+                    </>
+                  )}
                 </Button>
               </div>
+
+              {/* Show error message if upload failed */}
+              {error && (
+                <Card className="p-4 bg-red-50 border border-red-200">
+                  <div className="flex items-center space-x-2">
+                    <div className="w-5 h-5 text-red-500">
+                      <svg fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                      </svg>
+                    </div>
+                    <p className="text-red-700">
+                      {error.message || 'Error al procesar el archivo'}
+                    </p>
+                  </div>
+                </Card>
+              )}
 
               <input
                 type="file"

@@ -1,6 +1,6 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { getMentors, createMentor as createMentorAPI } from '../services/mentorService';
-import { getResources } from '../services/resourceService';
+import { getResources, uploadResource as uploadResourceAPI } from '../services/resourceService';
 
 // Helper function for consistent ID comparison
 const compareIds = (id1, id2) => {
@@ -43,6 +43,22 @@ export const fetchResourcesForMentor = createAsyncThunk(
       return {
         mentorId,
         resources: response.resources
+      };
+    } catch (error) {
+      return rejectWithValue(error);
+    }
+  }
+);
+
+// Async Thunk for uploading a resource to a mentor
+export const uploadResource = createAsyncThunk(
+  'mentors/uploadResource',
+  async ({ mentorId, file }, { rejectWithValue }) => {
+    try {
+      const response = await uploadResourceAPI(mentorId, file);
+      return {
+        mentorId,
+        resource: response.resource
       };
     } catch (error) {
       return rejectWithValue(error);
@@ -253,6 +269,27 @@ const mentorsSlice = createSlice({
         state.error = action.payload || {
           error: 'FETCH_RESOURCES_ERROR',
           message: 'Error al cargar los recursos del mentor'
+        };
+      })
+      // Handle uploadResource async thunk
+      .addCase(uploadResource.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(uploadResource.fulfilled, (state, action) => {
+        state.loading = false;
+        const { mentorId, resource } = action.payload;
+        const mentorIndex = state.mentors.findIndex(mentor => compareIds(mentor.id, mentorId));
+        if (mentorIndex !== -1) {
+          state.mentors[mentorIndex].resources.push(resource);
+        }
+        state.error = null;
+      })
+      .addCase(uploadResource.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload || {
+          error: 'UPLOAD_RESOURCE_ERROR',
+          message: 'Error al subir el recurso'
         };
       });
   }

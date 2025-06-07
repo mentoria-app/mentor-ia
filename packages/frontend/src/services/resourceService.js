@@ -101,69 +101,78 @@ export const getResources = async (mentorId) => {
   }
 };
 
-// Upload a new resource to a mentor
+// Upload a new resource to a mentor - REAL API CALL
 export const uploadResource = async (mentorId, file) => {
-  return new Promise((resolve, reject) => {
-    setTimeout(() => {
-      try {
-        // Validation
-        if (!file) {
-          reject({
-            error: 'NO_FILE',
-            message: 'No se ha seleccionado ningún archivo'
-          });
-          return;
-        }
+  try {
+    // Validation
+    if (!file) {
+      throw {
+        error: 'NO_FILE',
+        message: 'No se ha seleccionado ningún archivo'
+      };
+    }
 
-        if (!mentorId) {
-          reject({
-            error: 'NO_MENTOR_ID',
-            message: 'ID de mentor requerido'
-          });
-          return;
-        }
+    if (!mentorId) {
+      throw {
+        error: 'NO_MENTOR_ID',
+        message: 'ID de mentor requerido'
+      };
+    }
 
-        // File size validation (max 50MB for mock)
-        const maxSize = 50 * 1024 * 1024; // 50MB
-        if (file.size > maxSize) {
-          reject({
-            error: 'FILE_TOO_LARGE',
-            message: 'El archivo es demasiado grande. Máximo 50MB.'
-          });
-          return;
-        }
+    // File size validation (max 50MB)
+    const maxSize = 50 * 1024 * 1024; // 50MB
+    if (file.size > maxSize) {
+      throw {
+        error: 'FILE_TOO_LARGE',
+        message: 'El archivo es demasiado grande. Máximo 50MB.'
+      };
+    }
 
-        // Determine file type
-        let fileType = 'file';
-        if (file.type.startsWith('image/')) fileType = 'image';
-        else if (file.type === 'application/pdf') fileType = 'pdf';
-        else if (file.type.startsWith('video/')) fileType = 'video';
-        else if (file.type.startsWith('audio/')) fileType = 'audio';
+    // Create FormData for file upload
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('mentor_id', mentorId);
 
-        const newResource = {
-          id: Date.now() + Math.random(),
-          title: file.name,
-          type: fileType,
-          size: formatFileSize(file.size),
-          uploadDate: new Date().toISOString().split('T')[0],
-          thumbnail: null,
-          url: `/mock/files/${file.name.toLowerCase().replace(/\s+/g, '-')}`,
-          mentorId: parseInt(mentorId)
-        };
+    // Make API call with FormData
+    const response = await api.post('/resources/upload', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
 
-        resolve({
-          resource: newResource,
-          message: 'Archivo subido correctamente',
-          uploadedAt: new Date().toISOString()
-        });
-      } catch (error) {
-        reject({
-          error: 'UPLOAD_ERROR',
-          message: 'Error al subir el archivo'
-        });
-      }
-    }, API_DELAY + Math.random() * 1000); // Variable upload time
-  });
+    return {
+      resource: response.data,
+      message: 'Archivo subido correctamente',
+      uploadedAt: new Date().toISOString()
+    };
+  } catch (error) {
+    console.error('Error uploading resource:', error);
+    
+    // Enhanced error handling
+    if (error.response) {
+      // Server responded with an error status
+      throw {
+        error: 'API_ERROR',
+        message: error.response.data.detail || 'Error del servidor al subir archivo',
+        status: error.response.status
+      };
+    } else if (error.request) {
+      // Network error
+      throw {
+        error: 'NETWORK_ERROR',
+        message: 'Error de conexión. Intenta nuevamente.'
+      };
+    } else if (error.error) {
+      // Validation error from our function
+      throw error;
+    } else {
+      // Other error
+      throw {
+        error: 'UNKNOWN_ERROR',
+        message: 'Error inesperado al subir archivo'
+      };
+    }
+  }
 };
 
 // Upload resource from URL

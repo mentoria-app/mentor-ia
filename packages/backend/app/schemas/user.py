@@ -16,7 +16,7 @@ class UserCreate(BaseModel):
 
 class User(UserBase):
     """Schema for user responses (without password)."""
-    id: int
+    id: str 
     created_at: datetime
     updated_at: Optional[datetime] = None
     
@@ -25,7 +25,7 @@ class User(UserBase):
 
 class UserInDB(UserBase):
     """Schema for user stored in database (with hashed password)."""
-    id: int
+    id: str  
     hashed_password: str
     created_at: datetime
     updated_at: Optional[datetime] = None

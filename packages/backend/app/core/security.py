@@ -107,15 +107,47 @@ async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(s
     if user_id is None or user_email is None:
         raise credentials_exception
     
-    # For now, we'll create a minimal User object from the JWT payload
-    # In a production system, you might want to fetch fresh user data from the database
-    user = User(
-        id=user_id,
-        email=user_email,
-        full_name=None,  # Could be added to JWT payload if needed
-        is_active=True,
-        created_at=datetime.utcnow(),  # This would ideally come from the database
-        updated_at=None
-    )
-    
-    return user
+    try:
+        # Fetch the user data from Supabase
+        response = supabase().auth.get_user(credentials.credentials)
+        
+        if response.user is None:
+            raise credentials_exception
+        
+        # Helper function to safely parse Supabase datetime strings
+        def parse_supabase_datetime(date_str):
+            if not date_str:
+                return None
+            try:
+                # Handle both 'Z' and '+00:00' timezone formats
+                if date_str.endswith('Z'):
+                    date_str = date_str.replace('Z', '+00:00')
+                return datetime.fromisoformat(date_str)
+            except (ValueError, AttributeError):
+                # Fallback to current time if parsing fails
+                return datetime.utcnow()
+        
+        # Create User object from Supabase response
+        user = User(
+            id=str(response.user.id),  # Ensure it's a string
+            email=response.user.email,
+            full_name=response.user.user_metadata.get("full_name") if response.user.user_metadata else None,
+            is_active=True,
+            created_at=parse_supabase_datetime(response.user.created_at),
+            updated_at=parse_supabase_datetime(response.user.updated_at)
+        )
+        
+        return user
+        
+    except Exception as e:
+        # If Supabase call fails, fall back to creating user from JWT data
+        user = User(
+            id=str(user_id),  # Ensure it's a string
+            email=user_email,
+            full_name=None,
+            is_active=True,
+            created_at=datetime.utcnow(),
+            updated_at=None
+        )
+        
+        return user

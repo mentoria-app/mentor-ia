@@ -45,13 +45,27 @@ async def register(user_data: UserCreate):
         
         # Return user data (excluding sensitive information)
         from datetime import datetime
+        
+        # Helper function to safely parse Supabase datetime strings
+        def parse_supabase_datetime(date_str):
+            if not date_str:
+                return None
+            try:
+                # Handle both 'Z' and '+00:00' timezone formats
+                if date_str.endswith('Z'):
+                    date_str = date_str.replace('Z', '+00:00')
+                return datetime.fromisoformat(date_str)
+            except (ValueError, AttributeError):
+                # Fallback to current time if parsing fails
+                return datetime.utcnow()
+        
         return User(
-            id=response.user.id,  
+            id=str(response.user.id),  # Explicitly convert to string
             email=response.user.email,
             full_name=response.user.user_metadata.get("full_name") if response.user.user_metadata else None,
             is_active=True,
-            created_at=datetime.fromisoformat(response.user.created_at.replace('Z', '+00:00')),
-            updated_at=datetime.fromisoformat(response.user.updated_at.replace('Z', '+00:00')) if response.user.updated_at else None
+            created_at=parse_supabase_datetime(response.user.created_at),
+            updated_at=parse_supabase_datetime(response.user.updated_at)
         )
         
     except Exception as e:

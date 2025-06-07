@@ -1,27 +1,42 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 import { Button, Input } from '../components/common';
+import { loginUser, registerUser, clearAuthError, resetRegistrationSuccess } from '../state/authSlice';
+import { selectAuthLoading, selectAuthError, selectIsAuthenticated, selectRegistrationSuccess } from '../state/authSlice';
 
 const AuthPage = () => {
   const [isLogin, setIsLogin] = useState(true);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [loading, setLoading] = useState(false);
+  const [name, setName] = useState('');
+  
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+
+  const loading = useSelector(selectAuthLoading);
+  const error = useSelector(selectAuthError);
+  const isAuthenticated = useSelector(selectIsAuthenticated);
+  const registrationSuccess = useSelector(selectRegistrationSuccess);
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate('/mentors');
+    }
+    return () => {
+      dispatch(clearAuthError());
+      dispatch(resetRegistrationSuccess());
+    };
+  }, [isAuthenticated, navigate, dispatch]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true);
-    
-    try {
-      // TODO: Implement authentication logic here
-      console.log('Form submitted:', { email, password, isLogin });
-      
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-    } catch (error) {
-      console.error('Authentication error:', error);
-    } finally {
-      setLoading(false);
+    dispatch(clearAuthError());
+
+    if (isLogin) {
+      dispatch(loginUser({ email, password }));
+    } else {
+      dispatch(registerUser({ full_name: name, email, password }));
     }
   };
 
@@ -29,6 +44,9 @@ const AuthPage = () => {
     setIsLogin(!isLogin);
     setEmail('');
     setPassword('');
+    setName('');
+    dispatch(clearAuthError());
+    dispatch(resetRegistrationSuccess());
   };
 
   return (
@@ -70,52 +88,83 @@ const AuthPage = () => {
 
         {/* Auth Form */}
         <div className="bg-surface rounded-lg shadow-sm border border-gray-200 p-6">
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <Input
-              type="email"
-              label="Correo electrónico"
-              placeholder="tu@email.com"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-            />
-
-            <Input
-              type="password"
-              label="Contraseña"
-              placeholder="••••••••"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-            />
-
-            <Button
-              type="submit"
+          {registrationSuccess ? (
+            <div className="text-center space-y-4">
+              <h3 className="text-xl font-bold text-green-600">¡Registro Exitoso!</h3>
+              <p className="text-text-secondary">
+                Hemos creado tu cuenta. Por favor, inicia sesión para continuar.
+              </p>
+              <Button onClick={() => {
+                setIsLogin(true);
+                dispatch(resetRegistrationSuccess());
+              }}
               className="w-full"
-              disabled={loading || !email || !password}
-            >
-              {loading ? (
-                <div className="flex items-center justify-center">
-                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
-                  {isLogin ? 'Iniciando sesión...' : 'Registrando...'}
-                </div>
-              ) : (
-                isLogin ? 'Iniciar Sesión' : 'Crear Cuenta'
+              >
+                Ir a Iniciar Sesión
+              </Button>
+            </div>
+          ) : (
+            <form onSubmit={handleSubmit} className="space-y-4">
+              {!isLogin && (
+                  <Input
+                type="text"
+                label="Nombre completo"
+                placeholder="Juan Pérez"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                required
+              />
               )}
-            </Button>
-          </form>
+              <Input
+                type="email"
+                label="Correo electrónico"
+                placeholder="tu@email.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+              />
 
-          <div className="mt-6 text-center">
-            <p className="text-text-secondary text-sm">
-              {isLogin ? '¿No tienes cuenta?' : '¿Ya tienes cuenta?'}
-            </p>
-            <button
-              onClick={toggleAuthMode}
-              className="text-primary font-medium text-sm hover:text-primary-600 transition-colors duration-200 mt-1"
-            >
-              {isLogin ? 'Regístrate aquí' : 'Inicia sesión aquí'}
-            </button>
-          </div>
+              <Input
+                type="password"
+                label="Contraseña"
+                placeholder="••••••••"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+              />
+
+              {error && <p className="text-red-500 text-sm text-center">{error.detail || 'An error occurred'}</p>}
+
+              <Button
+                type="submit"
+                className="w-full"
+                disabled={loading || !email || !password || (!isLogin && !name)}
+              >
+                {loading ? (
+                  <div className="flex items-center justify-center">
+                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
+                    {isLogin ? 'Iniciando sesión...' : 'Registrando...'}
+                  </div>
+                ) : (
+                  isLogin ? 'Iniciar Sesión' : 'Crear Cuenta'
+                )}
+              </Button>
+            </form>
+          )}
+
+          {!registrationSuccess && (
+            <div className="mt-6 text-center">
+              <p className="text-text-secondary text-sm">
+                {isLogin ? '¿No tienes cuenta?' : '¿Ya tienes cuenta?'}
+              </p>
+              <button
+                onClick={toggleAuthMode}
+                className="text-primary font-medium text-sm hover:text-primary-600 transition-colors duration-200 mt-1"
+              >
+                {isLogin ? 'Regístrate aquí' : 'Inicia sesión aquí'}
+              </button>
+            </div>
+          )}
         </div>
 
         {/* Footer */}

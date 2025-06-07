@@ -48,16 +48,17 @@ export {
 
 // Auth slice
 export {
-  loginStart,
-  loginSuccess,
-  loginFailure,
-  logout,
-  updateUser,
-  mockLogin,
+  loginUser,
+  registerUser,
+  logoutUser,
+  clearAuthError,
+  resetRegistrationSuccess,
   selectUser,
   selectIsAuthenticated,
   selectAuthLoading,
   selectAuthError,
+  selectAuthToken,
+  selectRegistrationSuccess,
   selectUserPreferences,
   selectUserStats
 } from './authSlice'; 

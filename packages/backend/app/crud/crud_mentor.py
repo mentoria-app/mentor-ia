@@ -25,6 +25,7 @@ def create_mentor(client: Client, mentor_data: MentorCreate, user_id: str) -> Me
             "name": mentor_data.name,
             "description": mentor_data.description,
             "expertise": mentor_data.expertise,
+            "color": mentor_data.color,
             "user_id": user_id,
             "created_at": datetime.utcnow().isoformat(),
             "updated_at": datetime.utcnow().isoformat()
@@ -135,19 +136,27 @@ def update_mentor(client: Client, mentor_id: str, update_data: MentorUpdate, use
     try:
         # Prepare update data, excluding None values
         update_dict = {}
+        has_updates = False
+        
         if update_data.name is not None:
             update_dict["name"] = update_data.name
+            has_updates = True
         if update_data.description is not None:
             update_dict["description"] = update_data.description
+            has_updates = True
         if update_data.expertise is not None:
             update_dict["expertise"] = update_data.expertise
+            has_updates = True
+        if update_data.color is not None:
+            update_dict["color"] = update_data.color
+            has_updates = True
         
-        # Always update the updated_at timestamp
-        update_dict["updated_at"] = datetime.utcnow().isoformat()
-        
-        if not update_dict:
-            # No fields to update besides timestamp
+        if not has_updates:
+            # No fields to update, just return current mentor
             return get_mentor_by_id(client, mentor_id, user_id)
+        
+        # Always update the updated_at timestamp when there are actual changes
+        update_dict["updated_at"] = datetime.utcnow().isoformat()
         
         # Update mentor with user_id filter for security
         response = client.table("mentors").update(update_dict).eq("id", mentor_id).eq("user_id", user_id).execute()

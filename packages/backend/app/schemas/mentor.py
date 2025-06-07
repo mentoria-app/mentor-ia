@@ -7,6 +7,7 @@ class MentorBase(BaseModel):
     name: str
     description: Optional[str] = None
     expertise: str
+    color: Optional[str] = "bg-primary"
 
 class MentorCreate(MentorBase):
     """Schema for mentor creation requests."""
@@ -17,6 +18,7 @@ class MentorUpdate(BaseModel):
     name: Optional[str] = None
     description: Optional[str] = None
     expertise: Optional[str] = None
+    color: Optional[str] = None
 
 class Mentor(MentorBase):
     """Schema for mentor responses."""

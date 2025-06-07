@@ -6,7 +6,7 @@ import logging
 from app.db.client import supabase
 from app.schemas.user import UserCreate, User
 from app.schemas.token import Token
-from app.core.security import create_access_token
+from app.core.security import create_access_token, get_current_user
 
 router = APIRouter()
 logger = logging.getLogger(__name__)
@@ -109,4 +109,20 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends()):
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Authentication failed",
             headers={"WWW-Authenticate": "Bearer"}
-        ) 
+        )
+
+@router.get("/me", response_model=User)
+async def get_current_user_info(current_user: User = Depends(get_current_user)):
+    """
+    Get current authenticated user information.
+    
+    This endpoint demonstrates how to use the get_current_user dependency
+    to protect routes and access user information.
+    
+    Args:
+        current_user: User object injected by the get_current_user dependency
+        
+    Returns:
+        User: The current authenticated user's information
+    """
+    return current_user 

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AppLayout } from './components/layout';
-import { Onboarding, MentorHub, MentorDashboard, Profile } from './pages';
+import { AuthPage, Onboarding, MentorHub, MentorDashboard, Profile } from './pages';
 
 function App() {
   const [activeTab, setActiveTab] = useState('resources');
@@ -9,19 +9,14 @@ function App() {
   return (
     <Router>
       <Routes>
+        {/* Authentication - No layout wrapper */}
+        <Route path="/auth" element={<AuthPage />} />
+        
         {/* Onboarding - No layout wrapper */}
         <Route path="/onboarding" element={<Onboarding />} />
         
         {/* Main app routes - Wrapped in AppLayout */}
-        <Route path="/" element={
-          <AppLayout 
-            headerTitle="MentorIA" 
-            activeTab={activeTab} 
-            onTabChange={setActiveTab}
-          >
-            <Navigate to="/mentors" replace />
-          </AppLayout>
-        } />
+        <Route path="/" element={<Navigate to="/auth" replace />} />
         
         <Route path="/mentors" element={
           <AppLayout 

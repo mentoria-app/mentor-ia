@@ -1,10 +1,18 @@
 import React, { useState } from 'react';
+import { useSelector } from 'react-redux';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import { AppLayout } from './components/layout';
+import { AppLayout, ProtectedRoute } from './components/layout';
 import { AuthPage, Onboarding, MentorHub, MentorDashboard, Profile } from './pages';
+import { selectIsAuthenticated } from './state/authSlice';
 
 function App() {
   const [activeTab, setActiveTab] = useState('resources');
+  const isAuthenticated = useSelector(selectIsAuthenticated);
+
+  // Component to handle default route based on auth status
+  const DefaultRoute = () => {
+    return <Navigate to={isAuthenticated ? "/mentors" : "/auth"} replace />;
+  };
 
   return (
     <Router>
@@ -16,37 +24,43 @@ function App() {
         <Route path="/onboarding" element={<Onboarding />} />
         
         {/* Main app routes - Wrapped in AppLayout */}
-        <Route path="/" element={<Navigate to="/auth" replace />} />
+        <Route path="/" element={<DefaultRoute />} />
         
         <Route path="/mentors" element={
-          <AppLayout 
-            headerTitle="Mis Mentores" 
-            activeTab={activeTab} 
-            onTabChange={setActiveTab}
-            showBottomNav={false}
-          >
-            <MentorHub />
-          </AppLayout>
+          <ProtectedRoute>
+            <AppLayout 
+              headerTitle="Mis Mentores" 
+              activeTab={activeTab} 
+              onTabChange={setActiveTab}
+              showBottomNav={false}
+            >
+              <MentorHub />
+            </AppLayout>
+          </ProtectedRoute>
         } />
         
         <Route path="/mentor/:mentorId" element={
-          <AppLayout 
-            activeTab={activeTab} 
-            onTabChange={setActiveTab}
-          >
-            <MentorDashboard />
-          </AppLayout>
+          <ProtectedRoute>
+            <AppLayout 
+              activeTab={activeTab} 
+              onTabChange={setActiveTab}
+            >
+              <MentorDashboard />
+            </AppLayout>
+          </ProtectedRoute>
         } />
         
         <Route path="/profile" element={
-          <AppLayout 
-            headerTitle="Perfil" 
-            activeTab={activeTab} 
-            onTabChange={setActiveTab}
-            showBottomNav={false}
-          >
-            <Profile />
-          </AppLayout>
+          <ProtectedRoute>
+            <AppLayout 
+              headerTitle="Perfil" 
+              activeTab={activeTab} 
+              onTabChange={setActiveTab}
+              showBottomNav={false}
+            >
+              <Profile />
+            </AppLayout>
+          </ProtectedRoute>
         } />
         
         {/* Catch all - redirect to mentors */}

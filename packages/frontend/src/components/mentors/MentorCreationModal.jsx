@@ -13,14 +13,14 @@ const MentorCreationModal = ({ isOpen }) => {
   });
 
   const colorOptions = [
-    { value: 'bg-primary', label: 'Azul', color: '#3b82f6' },
-    { value: 'bg-secondary', label: 'Verde', color: '#10b981' },
-    { value: 'bg-purple-500', label: 'Púrpura', color: '#8b5cf6' },
-    { value: 'bg-red-500', label: 'Rojo', color: '#ef4444' },
-    { value: 'bg-yellow-500', label: 'Amarillo', color: '#eab308' },
-    { value: 'bg-indigo-500', label: 'Índigo', color: '#6366f1' },
-    { value: 'bg-pink-500', label: 'Rosa', color: '#ec4899' },
-    { value: 'bg-orange-500', label: 'Naranja', color: '#f97316' }
+    { value: 'bg-primary', color: '#3b82f6' },
+    { value: 'bg-secondary', color: '#10b981' },
+    { value: 'bg-purple-500', color: '#8b5cf6' },
+    { value: 'bg-red-500', color: '#ef4444' },
+    { value: 'bg-yellow-500', color: '#eab308' },
+    { value: 'bg-indigo-500', color: '#6366f1' },
+    { value: 'bg-pink-500', color: '#ec4899' },
+    { value: 'bg-orange-500', color: '#f97316' }
   ];
 
   const handleClose = () => {
@@ -50,10 +50,10 @@ const MentorCreationModal = ({ isOpen }) => {
       // Dispatch action to add new mentor
       dispatch(addMentor({
         name: formData.name.trim(),
-        subject: formData.subject.trim(),
+        expertise: formData.subject.trim(),
         color: formData.color,
         description: formData.description.trim() || `Tu mentor especializado en ${formData.subject.toLowerCase()}`,
-        avatarUrl: null
+        avatar_url: null
       }));
       
       // Close modal and reset form
@@ -152,7 +152,6 @@ const MentorCreationModal = ({ isOpen }) => {
                     <div 
                       className={`w-8 h-8 ${option.value} rounded-full`}
                     />
-                    <span className="text-xs text-text-secondary">{option.label}</span>
                   </div>
                 </button>
               ))}

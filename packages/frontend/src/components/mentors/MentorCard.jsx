@@ -10,8 +10,8 @@ const MentorCard = ({
   const { 
     id, 
     name, 
-    subject, 
-    avatar, 
+    expertise, 
+    avatar_url, 
     resourceCount = 0, 
     color = 'bg-primary' 
   } = mentor || {};
@@ -25,9 +25,9 @@ const MentorCard = ({
       <div className="flex items-center space-x-4">
         {/* Mentor Avatar */}
         <div className="relative">
-          {avatar ? (
+          {avatar_url ? (
             <Avatar 
-              src={avatar} 
+              src={avatar_url} 
               size="lg" 
               alt={name}
               className="transition-transform duration-200"
@@ -46,9 +46,9 @@ const MentorCard = ({
           <h3 className="font-semibold text-text-primary text-lg truncate">
             {name || 'Mentor'}
           </h3>
-          {subject && (
+          {expertise && (
             <p className="text-sm text-text-secondary truncate">
-              {subject}
+              {expertise}
             </p>
           )}
           <div className="flex items-center mt-2 space-x-4">

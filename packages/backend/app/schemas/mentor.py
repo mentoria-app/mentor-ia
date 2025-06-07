@@ -8,6 +8,7 @@ class MentorBase(BaseModel):
     description: Optional[str] = None
     expertise: str
     avatar_url: Optional[str] = None
+    color: Optional[str] = None
 
 class MentorCreate(MentorBase):
     """Schema for mentor creation requests."""
@@ -19,6 +20,7 @@ class MentorUpdate(BaseModel):
     description: Optional[str] = None
     expertise: Optional[str] = None
     avatar_url: Optional[str] = None
+    color: Optional[str] = None
 
 class Mentor(MentorBase):
     """Schema for mentor responses."""

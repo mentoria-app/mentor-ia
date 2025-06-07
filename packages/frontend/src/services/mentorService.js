@@ -6,8 +6,8 @@ let mockMentors = [
   {
     id: 1,
     name: 'Matemáticas',
-    subject: 'Álgebra y Cálculo',
-    avatarUrl: null,
+    expertise: 'Álgebra y Cálculo',
+    avatar_url: null,
     color: 'bg-primary',
     description: 'Tu mentor especializado en matemáticas avanzadas',
     createdAt: '2024-01-15T10:00:00Z',
@@ -36,8 +36,8 @@ let mockMentors = [
   {
     id: 2,
     name: 'Historia',
-    subject: 'Historia Universal',
-    avatarUrl: null,
+    expertise: 'Historia Universal',
+    avatar_url: null,
     color: 'bg-secondary',
     description: 'Tu mentor especializado en historia mundial',
     createdAt: '2024-01-10T09:00:00Z',
@@ -57,8 +57,8 @@ let mockMentors = [
   {
     id: 3,
     name: 'Biología',
-    subject: 'Biología Celular',
-    avatarUrl: null,
+    expertise: 'Biología Celular',
+    avatar_url: null,
     color: 'bg-purple-500',
     description: 'Tu mentor especializado en biología y ciencias de la vida',
     createdAt: '2024-01-08T14:20:00Z',
@@ -140,7 +140,7 @@ export const createMentor = async (mentorData) => {
     setTimeout(() => {
       try {
         // Validation
-        if (!mentorData.name || !mentorData.subject) {
+        if (!mentorData.name || !mentorData.expertise) {
           reject({
             error: 'VALIDATION_ERROR',
             message: 'Nombre y materia son requeridos'
@@ -165,10 +165,10 @@ export const createMentor = async (mentorData) => {
         const newMentor = {
           id: Date.now(), // Simple ID generation for mock
           name: mentorData.name.trim(),
-          subject: mentorData.subject.trim(),
-          avatarUrl: mentorData.avatarUrl || null,
+          expertise: mentorData.expertise.trim(),
+          avatar_url: mentorData.avatar_url || null,
           color: mentorData.color || 'bg-primary',
-          description: mentorData.description || `Tu mentor especializado en ${mentorData.subject.toLowerCase()}`,
+          description: mentorData.description || `Tu mentor especializado en ${mentorData.expertise.toLowerCase()}`,
           createdAt: new Date().toISOString(),
           updatedAt: new Date().toISOString(),
           resources: []

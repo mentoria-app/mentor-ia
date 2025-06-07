@@ -26,6 +26,7 @@ def create_mentor(client: Client, mentor_data: MentorCreate, user_id: str) -> Me
             "description": mentor_data.description,
             "expertise": mentor_data.expertise,
             "avatar_url": mentor_data.avatar_url,
+            "color": mentor_data.color,
             "user_id": user_id,
             "created_at": datetime.utcnow().isoformat(),
             "updated_at": datetime.utcnow().isoformat()
@@ -149,6 +150,9 @@ def update_mentor(client: Client, mentor_id: str, update_data: MentorUpdate, use
             has_updates = True
         if update_data.avatar_url is not None:
             update_dict["avatar_url"] = update_data.avatar_url
+            has_updates = True
+        if update_data.color is not None:
+            update_dict["color"] = update_data.color
             has_updates = True
         
         if not has_updates:

@@ -1,4 +1,31 @@
-import { createSlice } from '@reduxjs/toolkit';
+import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import { getMentors, createMentor as createMentorAPI } from '../services/mentorService';
+
+// Async Thunk for fetching mentors from the API
+export const fetchMentors = createAsyncThunk(
+  'mentors/fetchMentors',
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await getMentors();
+      return response.mentors;
+    } catch (error) {
+      return rejectWithValue(error);
+    }
+  }
+);
+
+// Async Thunk for creating a new mentor
+export const createMentor = createAsyncThunk(
+  'mentors/createMentor',
+  async (mentorData, { rejectWithValue }) => {
+    try {
+      const newMentor = await createMentorAPI(mentorData);
+      return newMentor;
+    } catch (error) {
+      return rejectWithValue(error);
+    }
+  }
+);
 
 // Mock initial mentors data
 const initialMentors = [
@@ -80,7 +107,7 @@ const initialMentors = [
 ];
 
 const initialState = {
-  mentors: initialMentors,
+  mentors: [], // Start with empty array, will be populated by fetchMentors
   activeMentorId: null,
   loading: false,
   error: null
@@ -147,6 +174,43 @@ const mentorsSlice = createSlice({
       state.error = action.payload;
       state.loading = false;
     }
+  },
+  extraReducers: (builder) => {
+    builder
+      // Handle fetchMentors async thunk
+      .addCase(fetchMentors.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchMentors.fulfilled, (state, action) => {
+        state.loading = false;
+        state.mentors = action.payload;
+        state.error = null;
+      })
+      .addCase(fetchMentors.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload || {
+          error: 'FETCH_ERROR',
+          message: 'Error al cargar los mentores'
+        };
+      })
+      // Handle createMentor async thunk
+      .addCase(createMentor.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(createMentor.fulfilled, (state, action) => {
+        state.loading = false;
+        state.mentors.push(action.payload);
+        state.error = null;
+      })
+      .addCase(createMentor.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload || {
+          error: 'CREATE_ERROR',
+          message: 'Error al crear el mentor'
+        };
+      });
   }
 });
 

@@ -1,17 +1,35 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import { MentorCard, MentorCreationModal } from '../components/mentors';
 import { Button } from '../components/common';
-import { selectAllMentors, openMentorCreationModal, selectIsMentorCreationModalOpen } from '../state';
+import { 
+  selectAllMentors, 
+  selectMentorsLoading, 
+  selectMentorsError,
+  fetchMentors,
+  openMentorCreationModal, 
+  selectIsMentorCreationModalOpen 
+} from '../state';
+import { selectIsAuthenticated } from '../state';
 
 const MentorHub = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   
-  // Get mentors from Redux store
+  // Get mentors and auth state from Redux store
   const mentors = useSelector(selectAllMentors);
+  const loading = useSelector(selectMentorsLoading);
+  const error = useSelector(selectMentorsError);
+  const isAuthenticated = useSelector(selectIsAuthenticated);
   const isMentorCreationModalOpen = useSelector(selectIsMentorCreationModalOpen);
+
+  // Fetch mentors on component mount if user is authenticated
+  useEffect(() => {
+    if (isAuthenticated) {
+      dispatch(fetchMentors());
+    }
+  }, [dispatch, isAuthenticated]);
 
   const handleMentorClick = (mentor) => {
     navigate(`/mentor/${mentor.id}`);
@@ -20,6 +38,39 @@ const MentorHub = () => {
   const handleCreateMentor = () => {
     dispatch(openMentorCreationModal());
   };
+
+  // Handle loading state
+  if (loading) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-full p-4">
+        <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin mb-4"></div>
+        <p className="text-text-secondary">Cargando mentores...</p>
+      </div>
+    );
+  }
+
+  // Handle error state
+  if (error) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-full p-4">
+        <div className="w-24 h-24 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+          <span className="text-4xl">⚠️</span>
+        </div>
+        <h2 className="text-xl font-semibold text-text-primary mb-2">
+          Error al cargar mentores
+        </h2>
+        <p className="text-text-secondary mb-6 text-center">
+          {error.message || 'Hubo un problema al cargar tus mentores. Intenta nuevamente.'}
+        </p>
+        <Button 
+          onClick={() => dispatch(fetchMentors())}
+          variant="outline"
+        >
+          Reintentar
+        </Button>
+      </div>
+    );
+  }
 
   return (
     <>

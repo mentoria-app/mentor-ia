@@ -1,7 +1,31 @@
-// Mock mentor service
-const API_DELAY = 800; // Simulate network delay
+import axios from 'axios';
 
-// Mock mentors data (matches Redux initial state)
+const API_BASE_URL = import.meta.env.VITE_APP_API_URL || 'http://localhost:8000/api/v1';
+
+const api = axios.create({
+  baseURL: API_BASE_URL,
+  headers: {
+    'Content-Type': 'application/json',
+  },
+});
+
+api.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem('authToken');
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);
+
+// Mock delay for development
+const API_DELAY = 800;
+
+// Mock mentors data (for fallback/development)
 let mockMentors = [
   {
     id: 1,
@@ -86,33 +110,40 @@ let mockMentors = [
   }
 ];
 
-// Get all mentors
+// Get all mentors - REAL API CALL
 export const getMentors = async () => {
-  return new Promise((resolve, reject) => {
-    setTimeout(() => {
-      try {
-        // Simulate potential network error (5% chance)
-        if (Math.random() < 0.05) {
-          reject({
-            error: 'NETWORK_ERROR',
-            message: 'Error de conexión. Intenta nuevamente.'
-          });
-          return;
-        }
-
-        resolve({
-          mentors: mockMentors,
-          totalCount: mockMentors.length,
-          timestamp: new Date().toISOString()
-        });
-      } catch (error) {
-        reject({
-          error: 'UNKNOWN_ERROR',
-          message: 'Error inesperado al obtener mentores'
-        });
-      }
-    }, API_DELAY);
-  });
+  try {
+    const response = await api.get('/mentors/');
+    return {
+      mentors: response.data,
+      totalCount: response.data.length,
+      timestamp: new Date().toISOString()
+    };
+  } catch (error) {
+    console.error('Error fetching mentors:', error);
+    
+    // Enhanced error handling
+    if (error.response) {
+      // Server responded with an error status
+      throw {
+        error: 'API_ERROR',
+        message: error.response.data.detail || 'Error del servidor',
+        status: error.response.status
+      };
+    } else if (error.request) {
+      // Network error
+      throw {
+        error: 'NETWORK_ERROR',
+        message: 'Error de conexión. Intenta nuevamente.'
+      };
+    } else {
+      // Other error
+      throw {
+        error: 'UNKNOWN_ERROR',
+        message: 'Error inesperado al obtener mentores'
+      };
+    }
+  }
 };
 
 // Get a specific mentor by ID
@@ -134,58 +165,49 @@ export const getMentorById = async (mentorId) => {
   });
 };
 
-// Create a new mentor
+// Create a new mentor - REAL API CALL
 export const createMentor = async (mentorData) => {
-  return new Promise((resolve, reject) => {
-    setTimeout(() => {
-      try {
-        // Validation
-        if (!mentorData.name || !mentorData.expertise) {
-          reject({
-            error: 'VALIDATION_ERROR',
-            message: 'Nombre y materia son requeridos'
-          });
-          return;
-        }
-
-        // Check if mentor with same name already exists
-        const existingMentor = mockMentors.find(
-          m => m.name.toLowerCase() === mentorData.name.toLowerCase()
-        );
-
-        if (existingMentor) {
-          reject({
-            error: 'MENTOR_EXISTS',
-            message: 'Ya existe un mentor con ese nombre'
-          });
-          return;
-        }
-
-        // Create new mentor
-        const newMentor = {
-          id: Date.now(), // Simple ID generation for mock
-          name: mentorData.name.trim(),
-          expertise: mentorData.expertise.trim(),
-          avatar_url: mentorData.avatar_url || null,
-          color: mentorData.color || 'bg-primary',
-          description: mentorData.description || `Tu mentor especializado en ${mentorData.expertise.toLowerCase()}`,
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString(),
-          resources: []
+  try {
+    const response = await api.post('/mentors/', {
+      name: mentorData.name,
+      expertise: mentorData.expertise,
+      description: mentorData.description,
+      color: mentorData.color,
+      avatar_url: mentorData.avatar_url
+    });
+    
+    return response.data;
+  } catch (error) {
+    console.error('Error creating mentor:', error);
+    
+    // Enhanced error handling
+    if (error.response) {
+      // Server responded with an error status
+      if (error.response.status === 400) {
+        throw {
+          error: 'VALIDATION_ERROR',
+          message: error.response.data.detail || 'Datos de mentor inválidos'
         };
-
-        // Add to mock data
-        mockMentors.push(newMentor);
-
-        resolve(newMentor);
-      } catch (error) {
-        reject({
-          error: 'CREATION_ERROR',
-          message: 'Error al crear el mentor'
-        });
       }
-    }, API_DELAY);
-  });
+      throw {
+        error: 'API_ERROR',
+        message: error.response.data.detail || 'Error del servidor',
+        status: error.response.status
+      };
+    } else if (error.request) {
+      // Network error
+      throw {
+        error: 'NETWORK_ERROR',
+        message: 'Error de conexión. Intenta nuevamente.'
+      };
+    } else {
+      // Other error
+      throw {
+        error: 'CREATION_ERROR',
+        message: 'Error al crear el mentor'
+      };
+    }
+  }
 };
 
 // Update an existing mentor

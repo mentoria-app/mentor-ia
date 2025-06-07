@@ -12,6 +12,8 @@ export {
   removeResourceFromMentor,
   setLoading as setMentorsLoading,
   setError as setMentorsError,
+  fetchMentors,
+  createMentor,
   selectAllMentors,
   selectActiveMentorId,
   selectActiveMentor,

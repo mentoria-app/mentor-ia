@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { Modal, Button } from '../common';
-import { closeMentorCreationModal, addMentor } from '../../state';
+import { closeMentorCreationModal, createMentor } from '../../state';
 
 const MentorCreationModal = ({ isOpen }) => {
   const dispatch = useDispatch();
@@ -43,21 +43,26 @@ const MentorCreationModal = ({ isOpen }) => {
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     
     if (formData.name.trim() && formData.subject.trim()) {
-      // Dispatch action to add new mentor
-      dispatch(addMentor({
-        name: formData.name.trim(),
-        expertise: formData.subject.trim(),
-        color: formData.color,
-        description: formData.description.trim() || `Tu mentor especializado en ${formData.subject.toLowerCase()}`,
-        avatar_url: null
-      }));
-      
-      // Close modal and reset form
-      handleClose();
+      try {
+        // Dispatch async thunk to create new mentor
+        await dispatch(createMentor({
+          name: formData.name.trim(),
+          expertise: formData.subject.trim(), // Map subject to expertise for backend
+          color: formData.color,
+          description: formData.description.trim() || `Tu mentor especializado en ${formData.subject.toLowerCase()}`,
+          avatar_url: null // Use snake_case for backend
+        })).unwrap();
+        
+        // Close modal and reset form only on success
+        handleClose();
+      } catch (error) {
+        // Error is handled by the Redux state
+        console.error('Error creating mentor:', error);
+      }
     }
   };
 

@@ -26,8 +26,8 @@ const MentorDashboard = ({ activeTab = 'resources' }) => {
   const isFlashcardModalOpen = useSelector(selectIsFlashcardGenerationModalOpen);
 
   useEffect(() => {
-    if (mentorId && parseInt(mentorId) !== activeMentorId) {
-      dispatch(setActiveMentor(parseInt(mentorId)));
+    if (mentorId && mentorId !== activeMentorId) {
+      dispatch(setActiveMentor(mentorId));
     }
   }, [mentorId, activeMentorId, dispatch]);
 
@@ -45,6 +45,9 @@ const MentorDashboard = ({ activeTab = 'resources' }) => {
       </div>
     );
   }
+
+  // Ensure resources array exists (fallback for backend compatibility)
+  const resources = mentor.resources || [];
 
   const handleUploadResource = () => {
     fileInputRef.current?.click();
@@ -155,7 +158,7 @@ const MentorDashboard = ({ activeTab = 'resources' }) => {
                     Tus Recursos
                   </h2>
                   <p className="text-sm text-gray-600">
-                    {mentor.resources.length} {mentor.resources.length === 1 ? 'recurso subido' : 'recursos subidos'}
+                    {resources.length} {resources.length === 1 ? 'recurso subido' : 'recursos subidos'}
                   </p>
                 </div>
                 
@@ -177,7 +180,7 @@ const MentorDashboard = ({ activeTab = 'resources' }) => {
                 multiple={false}
               />
 
-              {mentor.resources.length === 0 ? (
+              {resources.length === 0 ? (
                 <Card className="p-8 text-center border-2 border-dashed border-gray-300">
                   <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
                     <span className="text-2xl">📚</span>
@@ -197,7 +200,7 @@ const MentorDashboard = ({ activeTab = 'resources' }) => {
                 </Card>
               ) : (
                 <div className="space-y-3">
-                  {mentor.resources.map((resource) => (
+                  {resources.map((resource) => (
                     <ResourceCard
                       key={resource.id}
                       resource={resource}
@@ -218,9 +221,9 @@ const MentorDashboard = ({ activeTab = 'resources' }) => {
         <div className="flex-shrink-0 bg-gradient-to-r from-blue-500 to-blue-600 text-white p-6">
           <div className="flex items-center space-x-4">
             <div className="flex-shrink-0">
-              {mentor.avatarUrl ? (
+              {mentor.avatar_url ? (
                 <Avatar 
-                  src={mentor.avatarUrl} 
+                  src={mentor.avatar_url} 
                   size="xl" 
                   alt={mentor.name}
                   className="border-4 border-white"
@@ -239,7 +242,7 @@ const MentorDashboard = ({ activeTab = 'resources' }) => {
                 {mentor.name}
               </h1>
               <p className="text-blue-100 mt-1 truncate">
-                {mentor.subject}
+                {mentor.expertise}
               </p>
               <p className="text-blue-200 text-sm mt-2 truncate">
                 {mentor.description}
@@ -248,9 +251,9 @@ const MentorDashboard = ({ activeTab = 'resources' }) => {
 
             <div className="hidden sm:flex flex-col items-end space-y-1">
               <div className="text-right">
-                <p className="text-2xl font-bold">{mentor.resources.length}</p>
+                <p className="text-2xl font-bold">{resources.length}</p>
                 <p className="text-blue-200 text-sm">
-                  {mentor.resources.length === 1 ? 'Recurso' : 'Recursos'}
+                  {resources.length === 1 ? 'Recurso' : 'Recursos'}
                 </p>
               </div>
             </div>

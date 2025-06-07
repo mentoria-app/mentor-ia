@@ -1,6 +1,12 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { getMentors, createMentor as createMentorAPI } from '../services/mentorService';
 
+// Helper function for consistent ID comparison
+const compareIds = (id1, id2) => {
+  if (id1 == null || id2 == null) return false;
+  return id1.toString() === id2.toString();
+};
+
 // Async Thunk for fetching mentors from the API
 export const fetchMentors = createAsyncThunk(
   'mentors/fetchMentors',
@@ -132,16 +138,16 @@ const mentorsSlice = createSlice({
     },
     updateMentor: (state, action) => {
       const { id, updates } = action.payload;
-      const mentorIndex = state.mentors.findIndex(mentor => mentor.id === id);
+      const mentorIndex = state.mentors.findIndex(mentor => compareIds(mentor.id, id));
       if (mentorIndex !== -1) {
         state.mentors[mentorIndex] = { ...state.mentors[mentorIndex], ...updates };
       }
     },
     deleteMentor: (state, action) => {
       const mentorId = action.payload;
-      state.mentors = state.mentors.filter(mentor => mentor.id !== mentorId);
+      state.mentors = state.mentors.filter(mentor => !compareIds(mentor.id, mentorId));
       // If the deleted mentor was active, clear the active mentor
-      if (state.activeMentorId === mentorId) {
+      if (state.activeMentorId && compareIds(state.activeMentorId, mentorId)) {
         state.activeMentorId = null;
       }
     },
@@ -150,7 +156,7 @@ const mentorsSlice = createSlice({
     },
     addResourceToMentor: (state, action) => {
       const { mentorId, resource } = action.payload;
-      const mentor = state.mentors.find(m => m.id === mentorId);
+      const mentor = state.mentors.find(m => compareIds(m.id, mentorId));
       if (mentor) {
         const newResource = {
           ...resource,
@@ -162,7 +168,7 @@ const mentorsSlice = createSlice({
     },
     removeResourceFromMentor: (state, action) => {
       const { mentorId, resourceId } = action.payload;
-      const mentor = state.mentors.find(m => m.id === mentorId);
+      const mentor = state.mentors.find(m => compareIds(m.id, mentorId));
       if (mentor) {
         mentor.resources = mentor.resources.filter(r => r.id !== resourceId);
       }
@@ -232,10 +238,10 @@ export const selectAllMentors = (state) => state.mentors.mentors;
 export const selectActiveMentorId = (state) => state.mentors.activeMentorId;
 export const selectActiveMentor = (state) => {
   const activeMentorId = state.mentors.activeMentorId;
-  return state.mentors.mentors.find(mentor => mentor.id === activeMentorId) || null;
+  return state.mentors.mentors.find(mentor => compareIds(mentor.id, activeMentorId)) || null;
 };
 export const selectMentorById = (state, mentorId) => {
-  return state.mentors.mentors.find(mentor => mentor.id === parseInt(mentorId));
+  return state.mentors.mentors.find(mentor => compareIds(mentor.id, mentorId));
 };
 export const selectMentorsLoading = (state) => state.mentors.loading;
 export const selectMentorsError = (state) => state.mentors.error;

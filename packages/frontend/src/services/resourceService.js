@@ -1,3 +1,27 @@
+import axios from 'axios';
+
+const API_BASE_URL = import.meta.env.VITE_APP_API_URL || 'http://localhost:8000/api/v1';
+
+const api = axios.create({
+  baseURL: API_BASE_URL,
+  headers: {
+    'Content-Type': 'application/json',
+  },
+});
+
+api.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem('authToken');
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);
+
 // Mock resource service
 const API_DELAY = 600; // Simulate network delay
 
@@ -40,91 +64,41 @@ const formatFileSize = (bytes) => {
   return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
 };
 
-// Get resources for a specific mentor
+// Get resources for a specific mentor - REAL API CALL
 export const getResources = async (mentorId) => {
-  return new Promise((resolve, reject) => {
-    setTimeout(() => {
-      try {
-        // Mock resources based on mentorId
-        const mockResourcesMap = {
-          1: [ // Mathematics
-            {
-              id: 1,
-              title: 'Derivadas e Integrales.pdf',
-              type: 'pdf',
-              uploadDate: '2024-01-15',
-              size: '2.1 MB',
-              thumbnail: null,
-              url: '/mock/files/derivadas-integrales.pdf'
-            },
-            {
-              id: 2,
-              title: 'Ejercicios de Límites',
-              type: 'image',
-              uploadDate: '2024-01-10',
-              size: '850 KB',
-              thumbnail: null,
-              url: '/mock/files/ejercicios-limites.jpg'
-            }
-          ],
-          2: [ // History
-            {
-              id: 3,
-              title: 'Primera Guerra Mundial.pdf',
-              type: 'pdf',
-              uploadDate: '2024-01-12',
-              size: '3.2 MB',
-              thumbnail: null,
-              url: '/mock/files/primera-guerra-mundial.pdf'
-            }
-          ],
-          3: [ // Biology
-            {
-              id: 4,
-              title: 'Estructura Celular',
-              type: 'image',
-              uploadDate: '2024-01-08',
-              size: '1.2 MB',
-              thumbnail: null,
-              url: '/mock/files/estructura-celular.png'
-            },
-            {
-              id: 5,
-              title: 'Mitosis y Meiosis - YouTube',
-              type: 'url',
-              uploadDate: '2024-01-14',
-              size: null,
-              thumbnail: null,
-              url: 'https://youtube.com/watch?v=example'
-            }
-          ]
-        };
-
-        const resources = mockResourcesMap[parseInt(mentorId)] || [];
-
-        // Simulate potential error (3% chance)
-        if (Math.random() < 0.03) {
-          reject({
-            error: 'NETWORK_ERROR',
-            message: 'Error al cargar recursos. Intenta nuevamente.'
-          });
-          return;
-        }
-
-        resolve({
-          resources,
-          totalCount: resources.length,
-          mentorId: parseInt(mentorId),
-          timestamp: new Date().toISOString()
-        });
-      } catch (error) {
-        reject({
-          error: 'UNKNOWN_ERROR',
-          message: 'Error inesperado al obtener recursos'
-        });
-      }
-    }, API_DELAY);
-  });
+  try {
+    const response = await api.get(`/resources/mentor/${mentorId}`);
+    return {
+      resources: response.data,
+      totalCount: response.data.length,
+      mentorId: mentorId,
+      timestamp: new Date().toISOString()
+    };
+  } catch (error) {
+    console.error('Error fetching resources:', error);
+    
+    // Enhanced error handling
+    if (error.response) {
+      // Server responded with an error status
+      throw {
+        error: 'API_ERROR',
+        message: error.response.data.detail || 'Error del servidor al cargar recursos',
+        status: error.response.status
+      };
+    } else if (error.request) {
+      // Network error
+      throw {
+        error: 'NETWORK_ERROR',
+        message: 'Error de conexión. Intenta nuevamente.'
+      };
+    } else {
+      // Other error
+      throw {
+        error: 'UNKNOWN_ERROR',
+        message: 'Error inesperado al obtener recursos'
+      };
+    }
+  }
 };
 
 // Upload a new resource to a mentor

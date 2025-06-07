@@ -7,8 +7,10 @@ import { ChatInterface } from '../components/chat';
 import { 
   selectMentorById, 
   selectActiveMentorId, 
+  selectMentorsLoading,
   setActiveMentor,
   addResourceToMentor,
+  fetchResourcesForMentor,
   openQuizGenerationModal,
   openFlashcardGenerationModal,
   selectIsQuizGenerationModalOpen,
@@ -22,6 +24,7 @@ const MentorDashboard = ({ activeTab = 'resources' }) => {
   
   const activeMentorId = useSelector(selectActiveMentorId);
   const mentor = useSelector(state => selectMentorById(state, mentorId));
+  const loading = useSelector(selectMentorsLoading);
   const isQuizModalOpen = useSelector(selectIsQuizGenerationModalOpen);
   const isFlashcardModalOpen = useSelector(selectIsFlashcardGenerationModalOpen);
 
@@ -30,6 +33,13 @@ const MentorDashboard = ({ activeTab = 'resources' }) => {
       dispatch(setActiveMentor(mentorId));
     }
   }, [mentorId, activeMentorId, dispatch]);
+
+  // Fetch resources when mentor changes
+  useEffect(() => {
+    if (mentor?.id) {
+      dispatch(fetchResourcesForMentor(mentor.id));
+    }
+  }, [mentor?.id, dispatch]);
 
   if (!mentor) {
     return (
@@ -181,23 +191,30 @@ const MentorDashboard = ({ activeTab = 'resources' }) => {
               />
 
               {resources.length === 0 ? (
-                <Card className="p-8 text-center border-2 border-dashed border-gray-300">
-                  <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <span className="text-2xl">📚</span>
-                  </div>
-                  <h3 className="text-lg font-medium text-gray-900 mb-2">
-                    No hay recursos aún
-                  </h3>
-                  <p className="text-gray-600 mb-4">
-                    Sube tu primer recurso para que tu mentor pueda ayudarte mejor
-                  </p>
-                  <Button
-                    onClick={handleUploadResource}
-                    className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg"
-                  >
-                    Subir Primer Recurso
-                  </Button>
-                </Card>
+                loading ? (
+                  <Card className="p-8 text-center">
+                    <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+                    <p className="text-text-secondary">Cargando recursos...</p>
+                  </Card>
+                ) : (
+                  <Card className="p-8 text-center border-2 border-dashed border-gray-300">
+                    <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                      <span className="text-2xl">📚</span>
+                    </div>
+                    <h3 className="text-lg font-medium text-gray-900 mb-2">
+                      No hay recursos aún
+                    </h3>
+                    <p className="text-gray-600 mb-4">
+                      Sube tu primer recurso para que tu mentor pueda ayudarte mejor
+                    </p>
+                    <Button
+                      onClick={handleUploadResource}
+                      className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg"
+                    >
+                      Subir Primer Recurso
+                    </Button>
+                  </Card>
+                )
               ) : (
                 <div className="space-y-3">
                   {resources.map((resource) => (

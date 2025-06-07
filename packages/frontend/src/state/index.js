@@ -14,6 +14,7 @@ export {
   setError as setMentorsError,
   fetchMentors,
   createMentor,
+  fetchResourcesForMentor,
   selectAllMentors,
   selectActiveMentorId,
   selectActiveMentor,

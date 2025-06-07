@@ -5,12 +5,17 @@ const ResourceCard = ({ resource, onClick, className = '', ...props }) => {
   const {
     id,
     title,
+    name,
     type,
     uploadDate,
+    created_at,
     size,
     thumbnail,
-    status = 'Analyzed' // Default status if not provided
+    status = 'analyzed'
   } = resource || {};
+
+  const displayTitle = title || name || 'Recurso sin título';
+  const displayDate = uploadDate || (created_at ? new Date(created_at).toISOString().split('T')[0] : null);
 
   const getTypeIcon = (type) => {
     switch (type) {
@@ -18,7 +23,9 @@ const ResourceCard = ({ resource, onClick, className = '', ...props }) => {
       case 'image': return '🖼️';
       case 'video': return '🎥';
       case 'audio': return '🎵';
-      case 'url': return '🔗';
+      case 'url':
+      case 'youtube_link': return '🔗';
+      case 'text': return '📝';
       default: return '📎';
     }
   };
@@ -29,17 +36,32 @@ const ResourceCard = ({ resource, onClick, className = '', ...props }) => {
       case 'image': return 'bg-blue-100 text-blue-600';
       case 'video': return 'bg-purple-100 text-purple-600';
       case 'audio': return 'bg-green-100 text-green-600';
-      case 'url': return 'bg-yellow-100 text-yellow-600';
+      case 'url':
+      case 'youtube_link': return 'bg-yellow-100 text-yellow-600';
+      case 'text': return 'bg-gray-100 text-gray-600';
       default: return 'bg-gray-100 text-gray-600';
     }
   };
 
   const getStatusColor = (status) => {
-    switch (status) {
-      case 'Analyzed': return 'bg-green-100 text-green-700';
-      case 'Pending': return 'bg-yellow-100 text-yellow-700';
-      case 'Error': return 'bg-red-100 text-red-700';
+    const normalizedStatus = status?.toLowerCase();
+    switch (normalizedStatus) {
+      case 'analyzed': return 'bg-green-100 text-green-700';
+      case 'pending': return 'bg-yellow-100 text-yellow-700';
+      case 'processing': return 'bg-blue-100 text-blue-700';
+      case 'error': return 'bg-red-100 text-red-700';
       default: return 'bg-gray-100 text-gray-700';
+    }
+  };
+
+  const getStatusLabel = (status) => {
+    const normalizedStatus = status?.toLowerCase();
+    switch (normalizedStatus) {
+      case 'analyzed': return 'Analizado';
+      case 'pending': return 'Pendiente';
+      case 'processing': return 'Procesando';
+      case 'error': return 'Error';
+      default: return status || 'Desconocido';
     }
   };
 
@@ -83,7 +105,7 @@ const ResourceCard = ({ resource, onClick, className = '', ...props }) => {
           {thumbnail ? (
             <img 
               src={thumbnail} 
-              alt={title}
+              alt={displayTitle}
               className="w-12 h-12 rounded-lg object-cover"
             />
           ) : (
@@ -96,7 +118,7 @@ const ResourceCard = ({ resource, onClick, className = '', ...props }) => {
         {/* Resource Info */}
         <div className="flex-1 min-w-0">
           <h4 className="font-medium text-gray-900 truncate">
-            {title || 'Recurso sin título'}
+            {displayTitle}
           </h4>
           <div className="flex items-center space-x-2 mt-1">
             <span className="text-xs text-gray-500 uppercase">
@@ -110,12 +132,12 @@ const ResourceCard = ({ resource, onClick, className = '', ...props }) => {
             )}
             <span className="text-gray-300">•</span>
             <span className={`text-xs px-2 py-1 rounded-full font-medium ${getStatusColor(status)}`}>
-              {status}
+              {getStatusLabel(status)}
             </span>
           </div>
-          {uploadDate && (
+          {displayDate && (
             <p className="text-xs text-gray-400 mt-1">
-              {formatDate(uploadDate)}
+              {formatDate(displayDate)}
             </p>
           )}
         </div>

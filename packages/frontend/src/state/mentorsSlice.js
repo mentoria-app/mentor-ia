@@ -1,5 +1,6 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { getMentors, createMentor as createMentorAPI } from '../services/mentorService';
+import { getResources } from '../services/resourceService';
 
 // Helper function for consistent ID comparison
 const compareIds = (id1, id2) => {
@@ -27,6 +28,22 @@ export const createMentor = createAsyncThunk(
     try {
       const newMentor = await createMentorAPI(mentorData);
       return newMentor;
+    } catch (error) {
+      return rejectWithValue(error);
+    }
+  }
+);
+
+// Async Thunk for fetching resources for a specific mentor
+export const fetchResourcesForMentor = createAsyncThunk(
+  'mentors/fetchResourcesForMentor',
+  async (mentorId, { rejectWithValue }) => {
+    try {
+      const response = await getResources(mentorId);
+      return {
+        mentorId,
+        resources: response.resources
+      };
     } catch (error) {
       return rejectWithValue(error);
     }
@@ -215,6 +232,27 @@ const mentorsSlice = createSlice({
         state.error = action.payload || {
           error: 'CREATE_ERROR',
           message: 'Error al crear el mentor'
+        };
+      })
+      // Handle fetchResourcesForMentor async thunk
+      .addCase(fetchResourcesForMentor.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchResourcesForMentor.fulfilled, (state, action) => {
+        state.loading = false;
+        const { mentorId, resources } = action.payload;
+        const mentorIndex = state.mentors.findIndex(mentor => compareIds(mentor.id, mentorId));
+        if (mentorIndex !== -1) {
+          state.mentors[mentorIndex].resources = resources;
+        }
+        state.error = null;
+      })
+      .addCase(fetchResourcesForMentor.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload || {
+          error: 'FETCH_RESOURCES_ERROR',
+          message: 'Error al cargar los recursos del mentor'
         };
       });
   }

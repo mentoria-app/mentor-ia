@@ -1,4 +1,4 @@
-<h1 align="center">MentorIA 📚🤖</h1>
+![Diseño sin título (27)](https://github.com/user-attachments/assets/9a3017bc-4a77-4abc-9a8d-db046bc935d4)
 <p align="center">
   <em>Mobile-first, AI-powered mentor that learns from <strong>your</strong> study material.</em><br>
   <code>PWA · React · Tailwind · FastAPI · Supabase · LangChain · GPT-4o / Mixtral</code>

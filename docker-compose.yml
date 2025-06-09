@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   # Define the backend API service
   api:

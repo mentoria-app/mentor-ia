@@ -13,8 +13,9 @@ const Header = ({ title, subtitle, className = '', ...props }) => {
   const allMentors = useSelector(selectAllMentors);
   const activeMentorId = useSelector(selectActiveMentorId);
 
-  // Check if we're on a mentor dashboard page
+  // Check if we're on different pages
   const isMentorDashboard = location.pathname.startsWith('/mentor/');
+  const isMentorHub = location.pathname === '/mentors';
   
   // Always call useSelector, but make it return null when not needed
   const currentMentor = useSelector(state => {
@@ -41,6 +42,62 @@ const Header = ({ title, subtitle, className = '', ...props }) => {
     setIsDropdownOpen(!isDropdownOpen);
   };
 
+  // Enhanced header for MentorHub
+  if (isMentorHub) {
+    return (
+      <header className={`sticky top-0 z-20 bg-white/95 backdrop-blur-md border-b border-gray-100 px-4 py-4 ${className}`} {...props}>
+        <div className="flex items-center justify-between">
+          {/* Left section - Title */}
+          <div className="flex items-center space-x-3">
+            {/* MentorIA logo/icon */}
+            <div className="w-8 h-8 bg-gradient-to-br from-primary-500 to-primary-600 rounded-xl flex items-center justify-center shadow-soft">
+              <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} 
+                  d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+              </svg>
+            </div>
+            
+            {/* Title and subtitle */}
+            <div>
+              <h1 className="text-xl font-bold text-text-primary">
+                {displayTitle}
+              </h1>
+              <p className="text-xs text-text-secondary -mt-0.5">
+                Compañeros IA de estudio
+              </p>
+            </div>
+          </div>
+
+          {/* Right section - Actions */}
+          <div className="flex items-center space-x-3">
+            {/* Notifications bell */}
+            <button className="relative p-2.5 text-text-secondary hover:text-primary transition-colors duration-200 
+              hover:bg-primary-50 rounded-xl group">
+              <img src="/icons/bell.svg" alt="Notificaciones" className="w-5 h-5" />
+              
+              {/* Notification dot */}
+              <div className="absolute top-1.5 right-1.5 w-2 h-2 bg-accent-500 rounded-full 
+                animate-pulse ring-1 ring-white shadow-sm" />
+                
+              {/* Tooltip on hover */}
+              <div className="absolute right-0 top-full mt-2 px-2 py-1 bg-gray-900 text-white text-xs rounded 
+                opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap">
+                Notificaciones
+              </div>
+            </button>
+
+            {/* Profile menu */}
+            <button className="p-2.5 text-text-secondary hover:text-primary transition-colors duration-200 
+              hover:bg-primary-50 rounded-xl">
+              <img src="/icons/profile.svg" alt="Perfil" className="w-5 h-5" />
+            </button>
+          </div>
+        </div>
+      </header>
+    );
+  }
+
+  // Standard header for other pages
   return (
     <header 
       className={`bg-surface shadow-sm border-b border-gray-100 px-4 py-3 relative ${className}`}
@@ -166,9 +223,17 @@ const Header = ({ title, subtitle, className = '', ...props }) => {
           </div>
         </div>
         
-        {/* Placeholder for future action buttons */}
+        {/* Action buttons for other pages */}
         <div className="flex items-center space-x-2">
-          {/* Future: Menu button, settings, etc. */}
+          {/* Notifications bell for other pages */}
+          <button className="relative p-2 text-text-secondary hover:text-primary transition-colors duration-200 
+            hover:bg-primary-50 rounded-lg group">
+            <img src="/icons/bell.svg" alt="Notificaciones" className="w-5 h-5" />
+            
+            {/* Notification dot */}
+            <div className="absolute top-1 right-1 w-2 h-2 bg-accent-500 rounded-full 
+              animate-pulse ring-1 ring-white shadow-sm" />
+          </button>
         </div>
       </div>
     </header>

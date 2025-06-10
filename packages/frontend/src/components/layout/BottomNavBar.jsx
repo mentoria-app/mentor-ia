@@ -2,10 +2,36 @@ import React from 'react';
 
 const BottomNavBar = ({ activeTab, onTabChange, className = '', ...props }) => {
   const navItems = [
-    { id: 'resources', label: 'Recursos', icon: '📚' },
-    { id: 'chat', label: 'Chat', icon: '💬' },
-    { id: 'quiz', label: 'Quiz', icon: '📝' },
-    { id: 'flashcards', label: 'Flashcards', icon: '🗃️' }
+    { 
+      id: 'resources', 
+      label: 'Recursos', 
+      icon: '/icons/resources.svg',
+      ariaLabel: 'Navegar a recursos de estudio'
+    },
+    { 
+      id: 'flashcards', 
+      label: 'Flashcards', 
+      icon: '/icons/flashcards.svg',
+      ariaLabel: 'Abrir tarjetas de estudio'
+    },
+    { 
+      id: 'chat', 
+      label: 'Chat', 
+      icon: '/icons/chat.svg',
+      ariaLabel: 'Iniciar conversación con el mentor'
+    },
+    { 
+      id: 'quiz', 
+      label: 'Quiz', 
+      icon: '/icons/quiz.svg',
+      ariaLabel: 'Realizar cuestionarios'
+    },
+    { 
+      id: 'profile', 
+      label: 'Perfil', 
+      icon: '/icons/profile.svg',
+      ariaLabel: 'Ver perfil de usuario'
+    }
   ];
 
   const handleTabClick = (tabId) => {
@@ -14,24 +40,111 @@ const BottomNavBar = ({ activeTab, onTabChange, className = '', ...props }) => {
     }
   };
 
+  const handleKeyDown = (event, tabId) => {
+    // Handle keyboard navigation
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault();
+      handleTabClick(tabId);
+    }
+  };
+
   return (
     <nav 
-      className={`bg-surface border-t border-gray-100 px-4 py-2 ${className}`}
+      className={`fixed bottom-0 left-0 right-0 bg-surface border-t border-gray-200 px-1 py-2 pb-safe z-50 shadow-lg ${className}`}
+      role="tablist"
+      aria-label="Navegación principal"
+      style={{
+        paddingBottom: 'max(8px, env(safe-area-inset-bottom))',
+      }}
       {...props}
     >
-      <div className="flex items-center justify-around">
+      <div className="flex items-center justify-around max-w-lg mx-auto">
         {navItems.map((item) => (
-          <button
+                      <button
             key={item.id}
             onClick={() => handleTabClick(item.id)}
-            className={`flex flex-col items-center justify-center p-2 rounded-lg transition-all duration-200 ${
+            onKeyDown={(e) => handleKeyDown(e, item.id)}
+            role="tab"
+            aria-selected={activeTab === item.id}
+            aria-label={item.ariaLabel}
+            aria-current={activeTab === item.id ? 'page' : undefined}
+            tabIndex={0}
+            className={`flex flex-col items-center justify-center px-2 py-3 transition-all duration-300 ease-out min-w-0 flex-1 min-h-[56px] touch-manipulation ${
               activeTab === item.id
-                ? 'text-primary bg-primary-50 scale-105'
-                : 'text-text-secondary hover:text-primary hover:bg-primary-50 hover:scale-105'
+                ? 'text-primary'
+                : 'text-gray-500 hover:text-primary'
             }`}
+            style={{ 
+              minTouchTarget: '44px',
+              border: 'none',
+              background: 'transparent',
+              outline: 'none',
+              WebkitTapHighlightColor: 'transparent',
+              WebkitAppearance: 'none',
+              MozAppearance: 'none',
+              appearance: 'none',
+              userSelect: 'none',
+              WebkitUserSelect: 'none',
+              MozUserSelect: 'none'
+            }}
           >
-            <span className="text-xl mb-1 transition-transform duration-200">{item.icon}</span>
-            <span className="text-xs font-medium">{item.label}</span>
+            <div className={`w-6 h-6 mb-1 transition-all duration-300 ease-out ${
+              activeTab === item.id ? 'transform scale-110' : 'transform scale-100'
+            }`}>
+              <svg 
+                className={`w-full h-full transition-all duration-300 ease-out ${
+                  activeTab === item.id 
+                    ? 'text-primary' 
+                    : 'text-gray-400'
+                }`}
+                fill="currentColor"
+                viewBox="0 0 24 24"
+              >
+                {item.id === 'resources' && (
+                  activeTab === item.id ? (
+                    <path d="M11.383,9.024,7.706,2.653a1,1,0,0,0-1.732,0L0,13H5.074A8.008,8.008,0,0,1,11.383,9.024Z M13,4V9.062A8.022,8.022,0,0,1,19.747,15H24V4Z M12,17m-6,0a6,6,0,1,1,12,0a6,6,0,0,1,-12,0"/>
+                  ) : (
+                    <path d="M23,3H13a1,1,0,0,0-1,1V7.27L9.6,3.11a2,2,0,0,0-3.47,0h0L.13,13.5a1,1,0,0,0,0,1A1,1,0,0,0,1,15H5.29A6.91,6.91,0,0,0,5,17a7,7,0,0,0,14,0,6.91,6.91,0,0,0-.29-2H23a1,1,0,0,0,1-1V4A1,1,0,0,0,23,3ZM2.73,13,7.86,4.11,11.29,10a7,7,0,0,0-5,3ZM12,22a5,5,0,1,1,5-5A5,5,0,0,1,12,22Zm10-9H17.74A7.07,7.07,0,0,0,14,10.29V5h8Z"/>
+                  )
+                )}
+                {item.id === 'flashcards' && (
+                  activeTab === item.id ? (
+                    <path d="M23.799,8.156l-3.413,10.398c-.447,1.519-1.57,2.658-2.952,3.203,.365-.847,.568-1.779,.568-2.758V9c0-3.86-3.141-7-7-7h-1.665C10.566,.381,12.723-.408,14.782,.221l5.686,1.746c2.604,.8,4.098,3.576,3.331,6.189Zm-7.797,.844v10c0,2.757-2.243,5-5,5H5.002C2.245,24,.002,21.757,.002,19V9C.002,6.243,2.245,4,5.002,4h6c2.757,0,5,2.243,5,5Z"/>
+                  ) : (
+                    <path d="M20.466,1.967L14.78,.221c-2.614-.797-5.406,.664-6.225,3.24l-.188,.539h-3.368C2.243,4,0,6.243,0,9v10c0,2.757,2.243,5,5,5h6c1.596,0,3.004-.766,3.92-1.934,.231,.032,.461,.052,.688,.052,2.167,0,4.144-1.414,4.775-3.564l3.413-10.397c.767-2.613-.727-5.39-3.331-6.189ZM11,22H5c-1.654,0-3-1.346-3-3V9c0-1.654,1.346-3,3-3h6c1.654,0,3,1.346,3,3v10c0,1.654-1.346,3-3,3ZM21.887,7.562l-3.412,10.397c-.358,1.214-1.413,2.022-2.603,2.132,.079-.353,.128-.716,.128-1.092V9c0-2.757-2.243-5-5-5h-.507c.534-1.501,2.163-2.341,3.7-1.867l5.686,1.746c1.562,.479,2.459,2.146,2.008,3.684Z"/>
+                  )
+                )}
+                {item.id === 'chat' && (
+                  activeTab === item.id ? (
+                    <path d="M20,0H4A4,4,0,0,0,0,4V16a4,4,0,0,0,4,4H6.9l4.451,3.763a1,1,0,0,0,1.292,0L17.1,20H20a4,4,0,0,0,4-4V4A4,4,0,0,0,20,0ZM7,5h5a1,1,0,0,1,0,2H7A1,1,0,0,1,7,5ZM17,15H7a1,1,0,0,1,0-2H17a1,1,0,0,1,0,2Zm0-4H7A1,1,0,0,1,7,9H17a1,1,0,0,1,0,2Z"/>
+                  ) : (
+                    <path d="M20,0H4A4,4,0,0,0,0,4V16a4,4,0,0,0,4,4H6.9l4.451,3.763a1,1,0,0,0,1.292,0L17.1,20H20a4,4,0,0,0,4-4V4A4,4,0,0,0,20,0Zm2,16a2,2,0,0,1-2,2H17.1a2,2,0,0,0-1.291.473L12,21.69,8.193,18.473h0A2,2,0,0,0,6.9,18H4a2,2,0,0,1-2-2V4A2,2,0,0,1,4,2H20a2,2,0,0,1,2,2Z M7,7h5a1,1,0,0,0,0-2H7A1,1,0,0,0,7,7Z M17,9H7a1,1,0,0,0,0,2H17a1,1,0,0,0,0-2Z M17,13H7a1,1,0,0,0,0,2H17a1,1,0,0,0,0-2Z"/>
+                  )
+                )}
+                {item.id === 'quiz' && (
+                  activeTab === item.id ? (
+                    <path d="m8,19.998h8v.31c0,2.035-1.655,3.69-3.69,3.69h-.619c-2.035,0-3.69-1.655-3.69-3.69v-.31Zm13-11c0,2.59-1.118,5.055-3.068,6.763-.739.648-1.275,1.413-1.594,2.237h-.838v.002h-7v-.002h-.937c-.358-.877-.926-1.702-1.695-2.417-2.149-2.001-3.167-4.83-2.793-7.761C3.59,3.78,6.904.515,10.956.057c2.567-.289,5.13.522,7.038,2.227,1.91,1.707,3.006,4.154,3.006,6.714Zm-7.5,4.502c0-.828-.672-1.5-1.5-1.5s-1.5.672-1.5,1.5.672,1.5,1.5,1.5,1.5-.672,1.5-1.5Zm1.453-7.034c-.212-1.212-1.207-2.207-2.417-2.418-.886-.162-1.783.081-2.464.653-.682.572-1.072,1.41-1.072,2.299,0,.553.447,1,1,1s1-.447,1-1c0-.297.131-.576.358-.767.229-.194.522-.273.832-.216.391.068.724.401.793.794.093.53-.213.905-.502,1.065-.443.244-1.481.815-1.481,2.123,0,.553.447,1,1,1s1-.447,1-1c0-.053,0-.125.447-.371,1.125-.621,1.729-1.893,1.506-3.163Z"/>
+                  ) : (
+                    <path d="m12 1c-5.72 0-9 3.098-9 8.5 0 4.835 2.557 6.881 4.702 7.747.188.076.313.258.321.464.033.975.109 1.869.226 2.656.19 1.3 1.195 2.317 2.501 2.531.413.067.833.102 1.25.102.408 0 .818-.033 1.217-.096 1.309-.208 2.314-1.222 2.503-2.521.124-.846.205-1.745.242-2.675.008-.202.132-.38.317-.454 2.153-.862 4.721-2.908 4.721-7.754 0-5.402-3.28-8.5-9-8.5zm.901 19.929c-.597.096-1.224.094-1.828-.004-.442-.072-.782-.413-.846-.848-.058-.393-.103-.824-.138-1.276.561.108 1.229.2 1.911.2.672 0 1.331-.089 1.887-.195-.046.525-.1.971-.146 1.289-.062.429-.399.764-.84.834zm2.635-5.532c-.605.242-1.058.717-1.322 1.288-.512.132-1.37.315-2.214.315-.854 0-1.722-.187-2.231-.32-.264-.571-.717-1.046-1.319-1.288-2.289-.923-3.449-2.906-3.449-5.892 0-4.313 2.355-6.5 7-6.5s7 2.187 7 6.5c0 2.993-1.166 4.977-3.464 5.897zm-2.536-1.397c0 .552-.448 1-1 1s-1-.448-1-1 .448-1 1-1 1 .448 1 1zm-.964-1.956c-.553 0-.998-.454-.998-1.006 0-.924.64-1.722 1.67-2.083.132-.046.33-.115.33-.917 0-.878-.121-1-1-1s-1 .122-1 1c0 .552-.447 1-1 1s-1-.448-1-1c0-1.991 1.01-3 3-3s3 1.009 3 3c0 1.474-.562 2.418-1.67 2.805-.178.062-.311.162-.334.207 0 .552-.446.995-.998.995z"/>
+                  )
+                )}
+                {item.id === 'profile' && (
+                  activeTab === item.id ? (
+                    <g>
+                      <circle cx="12" cy="6" r="6"/>
+                      <path d="M12,14c-5.27,0.06-9.53,4.34-9.6,9.6A1,1,0,0,0,3.4,24h17.2a1,1,0,0,0,1-1C21.53,18.34,17.27,14.06,12,14z"/>
+                    </g>
+                  ) : (
+                    <path d="M12,12A6,6,0,1,0,6,6,6.006,6.006,0,0,0,12,12ZM12,2A4,4,0,1,1,8,6,4,4,0,0,1,12,2Z M12,14a9.01,9.01,0,0,0-9,9,1,1,0,0,0,2,0,7,7,0,0,1,14,0,1,1,0,0,0,2,0A9.01,9.01,0,0,0,12,14Z"/>
+                  )
+                )}
+              </svg>
+            </div>
+            <span className={`text-xs transition-all duration-300 ease-out leading-tight text-center block max-w-full ${
+              activeTab === item.id ? 'font-semibold' : 'font-medium'
+            }`}>
+              {item.label}
+            </span>
           </button>
         ))}
       </div>

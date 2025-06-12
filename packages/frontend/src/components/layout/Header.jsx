@@ -125,19 +125,18 @@ const Header = ({ title, subtitle, className = '', ...props }) => {
         <div className="flex-1 flex justify-center">
           <div className="flex flex-col items-center min-w-0">
             <div className="flex items-center space-x-2">
-              <h1 className="text-lg font-semibold text-text-primary truncate">
-                {displayTitle}
-              </h1>
-              
               {/* Quick Mentor Switcher - Only show on MentorDashboard */}
-              {isMentorDashboard && allMentors.length > 1 && (
+              {isMentorDashboard && allMentors.length > 1 ? (
                 <div className="relative">
                   <button
                     onClick={toggleDropdown}
-                    className="p-1 text-text-secondary hover:text-primary transition-colors duration-200 hover:bg-primary-50 rounded"
+                    className="flex items-center space-x-1 px-2 py-1 text-text-primary hover:text-primary transition-colors duration-200 hover:bg-primary-50 rounded-lg"
                   >
+                    <h1 className="text-lg font-semibold truncate">
+                      {displayTitle}
+                    </h1>
                     <svg 
-                      className={`w-4 h-4 transition-transform duration-200 ${isDropdownOpen ? 'rotate-180' : ''}`}
+                      className={`w-4 h-4 transition-transform duration-200 flex-shrink-0 ${isDropdownOpen ? 'rotate-180' : ''}`}
                       fill="none" 
                       stroke="currentColor" 
                       viewBox="0 0 24 24"
@@ -150,63 +149,66 @@ const Header = ({ title, subtitle, className = '', ...props }) => {
                       />
                     </svg>
                   </button>
-
-                  {/* Dropdown Menu */}
-                  {isDropdownOpen && (
-                    <>
-                      {/* Backdrop */}
-                      <div 
-                        className="fixed inset-0 z-10"
-                        onClick={() => setIsDropdownOpen(false)}
-                      />
-                      
-                      {/* Dropdown Content */}
-                      <div className="absolute top-full left-1/2 transform -translate-x-1/2 mt-1 w-64 bg-surface border border-gray-200 rounded-lg shadow-lg z-20 animate-fade-in">
-                        <div className="py-2">
-                          <div className="px-3 py-2 text-xs font-medium text-text-secondary uppercase tracking-wide border-b border-gray-100">
-                            Cambiar mentor
-                          </div>
-                          {allMentors.map((mentor) => (
-                            <button
-                              key={mentor.id}
-                              onClick={() => handleMentorSwitch(mentor.id)}
-                              className={`w-full flex items-center px-3 py-2 text-sm transition-colors duration-150 ${
-                                activeMentorId === mentor.id 
-                                  ? 'bg-primary-50 text-primary border-r-2 border-primary' 
-                                  : 'text-text-primary hover:bg-primary-50 hover:text-primary'
-                              }`}
-                            >
-                              <div className={`w-3 h-3 ${mentor.color} rounded-full mr-3 flex-shrink-0`} />
-                              <div className="flex-1 text-left">
-                                <div className="font-medium truncate">{mentor.name}</div>
-                                <div className="text-xs text-text-secondary truncate">{mentor.subject}</div>
-                              </div>
-                              {activeMentorId === mentor.id && (
-                                <svg className="w-4 h-4 text-primary ml-2" fill="currentColor" viewBox="0 0 20 20">
-                                  <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                                </svg>
-                              )}
-                            </button>
-                          ))}
-                          <div className="border-t border-gray-100 mt-1 pt-1">
-                            <button
-                              onClick={() => {
-                                navigate('/mentors');
-                                setIsDropdownOpen(false);
-                              }}
-                              className="w-full flex items-center px-3 py-2 text-sm text-text-secondary hover:bg-gray-50 transition-colors duration-150"
-                            >
-                              <svg className="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                              </svg>
-                              <span>Ver todos los mentores</span>
-                            </button>
-                          </div>
-                        </div>
-                      </div>
-                    </>
-                  )}
                 </div>
+              ) : (
+                <h1 className="text-lg font-semibold text-text-primary truncate">
+                  {displayTitle}
+                </h1>
+              )}
+              
+              {/* Dropdown Menu */}
+              {isMentorDashboard && allMentors.length > 1 && isDropdownOpen && (
+                <>
+                  {/* Backdrop */}
+                  <div 
+                    className="fixed inset-0 z-10"
+                    onClick={() => setIsDropdownOpen(false)}
+                  />
+                  
+                  {/* Dropdown Content */}
+                  <div className="absolute top-full left-1/2 transform -translate-x-1/2 mt-1 w-64 bg-surface border border-gray-200 rounded-lg shadow-lg z-20 animate-fade-in">
+                    <div className="py-2">
+                      <div className="px-3 py-2 text-xs font-medium text-text-secondary uppercase tracking-wide border-b border-gray-100">
+                        Cambiar mentor
+                      </div>
+                      {allMentors.map((mentor) => (
+                        <button
+                          key={mentor.id}
+                          onClick={() => handleMentorSwitch(mentor.id)}
+                          className={`w-full flex items-center px-3 py-3 text-sm transition-colors duration-150 ${
+                            activeMentorId === mentor.id 
+                              ? 'bg-primary-50 text-primary border-r-2 border-primary' 
+                              : 'text-text-primary hover:bg-primary-50 hover:text-primary'
+                          }`}
+                        >
+                          <div className="flex-1 text-left">
+                            <div className="font-medium truncate">{mentor.name}</div>
+                            <div className="text-xs text-text-secondary truncate">{mentor.subject}</div>
+                          </div>
+                          {activeMentorId === mentor.id && (
+                            <svg className="w-4 h-4 text-primary ml-2" fill="currentColor" viewBox="0 0 20 20">
+                              <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                            </svg>
+                          )}
+                        </button>
+                      ))}
+                      <div className="border-t border-gray-100 mt-1 pt-1">
+                        <button
+                          onClick={() => {
+                            navigate('/mentors');
+                            setIsDropdownOpen(false);
+                          }}
+                          className="w-full flex items-center px-3 py-2 text-sm text-text-secondary hover:bg-gray-50 transition-colors duration-150"
+                        >
+                          <svg className="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                          </svg>
+                          <span>Ver todos los mentores</span>
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </>
               )}
             </div>
             

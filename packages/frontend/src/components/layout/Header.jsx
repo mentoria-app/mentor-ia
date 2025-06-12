@@ -1,87 +1,234 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback, useMemo, useEffect } from 'react';
 import { useNavigate, useLocation, useParams } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { selectAllMentors, selectActiveMentorId, selectMentorById } from '../../state/mentorsSlice';
+
+// SVG Icons as reusable components
+const ChevronDownIcon = ({ className, isOpen }) => (
+  <svg 
+    className={`w-4 h-4 transition-all duration-300 ease-out ${isOpen ? 'rotate-180 scale-110' : ''} ${className}`}
+    fill="none" 
+    stroke="currentColor" 
+    viewBox="0 0 24 24"
+    aria-hidden="true"
+  >
+    <path 
+      strokeLinecap="round" 
+      strokeLinejoin="round" 
+      strokeWidth={2} 
+      d="M19 9l-7 7-7-7" 
+    />
+  </svg>
+);
+
+const BackArrowIcon = ({ className }) => (
+  <svg 
+    className={`w-5 h-5 ${className}`}
+    fill="none" 
+    stroke="currentColor" 
+    viewBox="0 0 24 24"
+    aria-hidden="true"
+  >
+    <path 
+      strokeLinecap="round" 
+      strokeLinejoin="round" 
+      strokeWidth={2} 
+      d="M15 19l-7-7 7-7" 
+    />
+  </svg>
+);
+
+const MentorIcon = ({ className }) => (
+  <svg 
+    className={`w-5 h-5 text-white ${className}`} 
+    fill="none" 
+    stroke="currentColor" 
+    viewBox="0 0 24 24"
+    aria-hidden="true"
+  >
+    <path 
+      strokeLinecap="round" 
+      strokeLinejoin="round" 
+      strokeWidth={2} 
+      d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" 
+    />
+  </svg>
+);
+
+const CheckIcon = ({ className }) => (
+  <svg 
+    className={`w-4 h-4 ${className}`} 
+    fill="currentColor" 
+    viewBox="0 0 20 20"
+    aria-hidden="true"
+  >
+    <path 
+      fillRule="evenodd" 
+      d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" 
+      clipRule="evenodd" 
+    />
+  </svg>
+);
+
+const PlusIcon = ({ className }) => (
+  <svg 
+    className={`w-4 h-4 ${className}`} 
+    fill="none" 
+    stroke="currentColor" 
+    viewBox="0 0 24 24"
+    aria-hidden="true"
+  >
+    <path 
+      strokeLinecap="round" 
+      strokeLinejoin="round" 
+      strokeWidth={2} 
+      d="M12 6v6m0 0v6m0-6h6m-6 0H6" 
+    />
+  </svg>
+);
 
 const Header = ({ title, subtitle, className = '', ...props }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const params = useParams();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [isNavigating, setIsNavigating] = useState(false);
 
-  // Get mentor data from Redux store
+  // Memoized selectors for performance
   const allMentors = useSelector(selectAllMentors);
   const activeMentorId = useSelector(selectActiveMentorId);
 
-  // Check if we're on different pages
-  const isMentorDashboard = location.pathname.startsWith('/mentor/');
-  const isMentorHub = location.pathname === '/mentors';
-  const isProfile = location.pathname === '/profile';
-  
-  // Always call useSelector, but make it return null when not needed
+  // Memoized page type detection
+  const pageType = useMemo(() => {
+    if (location.pathname.startsWith('/mentor/')) return 'dashboard';
+    if (location.pathname === '/mentors') return 'hub';
+    if (location.pathname === '/profile') return 'profile';
+    return 'other';
+  }, [location.pathname]);
+
+  // Memoized current mentor selection
   const currentMentor = useSelector(state => {
-    if (isMentorDashboard && params.mentorId) {
+    if (pageType === 'dashboard' && params.mentorId) {
       return selectMentorById(state, params.mentorId);
     }
     return null;
   });
 
-  // Determine the actual title and subtitle to display
-  const displayTitle = title || (currentMentor ? currentMentor.name : 'MentorIA');
-  const displaySubtitle = subtitle || (currentMentor ? currentMentor.subject : undefined);
+  // Memoized display content
+  const displayContent = useMemo(() => ({
+    title: title || (currentMentor ? currentMentor.name : 'MentorIA'),
+    subtitle: subtitle || (currentMentor ? currentMentor.subject : undefined)
+  }), [title, subtitle, currentMentor]);
 
-  const handleBackClick = () => {
-    if (isProfile) {
-      navigate(-1); // Go back to the last visited page
-    } else {
-      navigate('/mentors'); // For mentor dashboard, go to mentors hub
+  // Navigation handlers with micro-interactions
+  const handleBackClick = useCallback(async () => {
+    setIsNavigating(true);
+    
+    // Add slight delay for visual feedback
+    setTimeout(() => {
+      if (pageType === 'profile') {
+        navigate(-1);
+      } else {
+        navigate('/mentors');
+      }
+      setIsNavigating(false);
+    }, 150);
+  }, [navigate, pageType]);
+
+  const handleMentorSwitch = useCallback(async (mentorId) => {
+    if (mentorId === activeMentorId) {
+      setIsDropdownOpen(false);
+      return;
     }
-  };
 
-  const handleMentorSwitch = (mentorId) => {
-    navigate(`/mentor/${mentorId}`);
+    setIsNavigating(true);
+    
+    // Smooth close animation before navigation
     setIsDropdownOpen(false);
-  };
+    
+    setTimeout(() => {
+      navigate(`/mentor/${mentorId}`);
+      setIsNavigating(false);
+    }, 200);
+  }, [navigate, activeMentorId]);
 
-  const toggleDropdown = () => {
-    setIsDropdownOpen(!isDropdownOpen);
-  };
+  const handleProfileClick = useCallback(async () => {
+    if (location.pathname === '/profile') return;
+    
+    setIsNavigating(true);
+    
+    setTimeout(() => {
+      navigate('/profile');
+      setIsNavigating(false);
+    }, 150);
+  }, [navigate, location.pathname]);
 
-  const handleProfileClick = () => {
-    navigate('/profile');
-  };
+  const toggleDropdown = useCallback((e) => {
+    e.stopPropagation();
+    setIsDropdownOpen(prev => !prev);
+  }, []);
 
-  // Enhanced header for MentorHub
-  if (isMentorHub) {
+  const closeDropdown = useCallback(() => {
+    setIsDropdownOpen(false);
+  }, []);
+
+  // Close dropdown on escape key
+  useEffect(() => {
+    const handleEscape = (e) => {
+      if (e.key === 'Escape' && isDropdownOpen) {
+        closeDropdown();
+      }
+    };
+
+    if (isDropdownOpen) {
+      document.addEventListener('keydown', handleEscape);
+      return () => document.removeEventListener('keydown', handleEscape);
+    }
+  }, [isDropdownOpen, closeDropdown]);
+
+  // Shared button styles
+  const buttonBaseStyles = "relative overflow-hidden transition-all duration-200 ease-out focus:outline-none focus:ring-2 focus:ring-primary-500/50 focus:ring-offset-1";
+  const iconButtonStyles = `${buttonBaseStyles} p-2 text-text-secondary hover:text-primary hover:bg-primary-50 rounded-lg hover:scale-105 active:scale-95`;
+  const backButtonStyles = `${iconButtonStyles} ${isNavigating ? 'scale-95 opacity-75' : ''}`;
+
+  // Hub Header Component
+  if (pageType === 'hub') {
     return (
-      <header className={`sticky top-0 z-20 bg-white/95 backdrop-blur-md border-b border-gray-100 px-4 py-4 ${className}`} {...props}>
+      <header 
+        className={`sticky top-0 z-20 bg-white/95 backdrop-blur-md border-b border-gray-100 px-4 py-4 transition-all duration-300 ${className}`} 
+        {...props}
+      >
         <div className="flex items-center justify-between">
-          {/* Left section - Title */}
+          {/* Left section - Logo and Title */}
           <div className="flex items-center space-x-3">
-            {/* MentorIA logo/icon */}
-            <div className="w-8 h-8 bg-gradient-to-br from-primary-500 to-primary-600 rounded-xl flex items-center justify-center shadow-soft">
-              <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} 
-                  d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
-              </svg>
+            {/* Animated Logo */}
+            <div className="w-8 h-8 bg-gradient-to-br from-primary-500 to-primary-600 rounded-xl flex items-center justify-center shadow-soft hover:shadow-md transition-all duration-300 hover:scale-110 cursor-pointer">
+              <MentorIcon className="transition-transform duration-300 hover:rotate-12" />
             </div>
             
-            {/* Title */}
+            {/* Title with subtle animation */}
             <div>
-              <h1 className="text-lg font-semibold text-text-primary">
+              <h1 className="text-lg font-semibold text-text-primary transition-colors duration-200">
                 Mis Mentores
               </h1>
             </div>
           </div>
 
-          {/* Right section - Profile only */}
+          {/* Right section - Profile */}
           <div className="flex items-center">
-            {/* Profile menu */}
             <button 
               onClick={handleProfileClick}
-              className="p-2 text-text-secondary hover:text-primary transition-colors duration-200 
-              hover:bg-primary-50 rounded-lg">
-              <img src="/icons/profile.svg" alt="Perfil" className="w-5 h-5" />
+              disabled={isNavigating}
+              className={`${iconButtonStyles} ${isNavigating ? 'scale-95 opacity-75' : ''}`}
+              aria-label="Ir al perfil"
+            >
+              <img 
+                src="/icons/profile.svg" 
+                alt="" 
+                className="w-5 h-5 transition-transform duration-200"
+              />
+              {/* Ripple effect */}
+              <span className="absolute inset-0 rounded-lg bg-primary-100 opacity-0 hover:opacity-20 transition-opacity duration-200" />
             </button>
           </div>
         </div>
@@ -89,144 +236,152 @@ const Header = ({ title, subtitle, className = '', ...props }) => {
     );
   }
 
-  // Standard header for other pages
+  // Standard Header for Dashboard and Profile
   return (
     <header 
-      className={`bg-surface shadow-sm border-b border-gray-100 px-4 py-4 relative ${className}`}
+      className={`bg-surface shadow-sm border-b border-gray-100 px-4 py-4 relative transition-all duration-300 ${className}`}
       {...props}
     >
       <div className="flex items-center justify-between">
         {/* Left section - Back button */}
         <div className="flex items-center">
-          {/* Back Button - Show on MentorDashboard and Profile */}
-          {(isMentorDashboard || isProfile) && (
+          {(pageType === 'dashboard' || pageType === 'profile') && (
             <button
               onClick={handleBackClick}
-              className="p-2 text-text-secondary hover:text-primary transition-colors duration-200 hover:bg-primary-50 rounded-lg"
+              disabled={isNavigating}
+              className={backButtonStyles}
+              aria-label={pageType === 'profile' ? 'Volver' : 'Volver a Mis Mentores'}
             >
-              <svg 
-                className="w-5 h-5" 
-                fill="none" 
-                stroke="currentColor" 
-                viewBox="0 0 24 24"
-              >
-                <path 
-                  strokeLinecap="round" 
-                  strokeLinejoin="round" 
-                  strokeWidth={2} 
-                  d="M15 19l-7-7 7-7" 
-                />
-              </svg>
+              <BackArrowIcon className="transition-transform duration-200 hover:-translate-x-0.5" />
+              <span className="absolute inset-0 rounded-lg bg-primary-100 opacity-0 hover:opacity-20 transition-opacity duration-200" />
             </button>
           )}
         </div>
 
         {/* Center section - Title and Mentor Switcher */}
         <div className="flex-1 flex justify-center">
-          <div className="flex flex-col items-center min-w-0">
+          <div className="flex flex-col items-center min-w-0 max-w-xs">
             <div className="flex items-center space-x-2">
-              {/* Quick Mentor Switcher - Only show on MentorDashboard */}
-              {isMentorDashboard && allMentors.length > 1 ? (
+              {/* Mentor Switcher or Static Title */}
+              {pageType === 'dashboard' && allMentors.length > 1 ? (
                 <div className="relative">
                   <button
                     onClick={toggleDropdown}
-                    className="flex items-center space-x-1 px-2 py-1 text-text-primary hover:text-primary transition-colors duration-200 hover:bg-primary-50 rounded-lg"
+                    disabled={isNavigating}
+                    className={`${buttonBaseStyles} flex items-center space-x-1 px-3 py-1.5 text-text-primary hover:text-primary hover:bg-primary-50 rounded-lg transition-all duration-200 hover:scale-105 active:scale-95 ${isDropdownOpen ? 'bg-primary-50 text-primary shadow-sm' : ''} ${isNavigating ? 'opacity-75' : ''}`}
+                    aria-label="Cambiar mentor"
+                    aria-expanded={isDropdownOpen}
+                    aria-haspopup="true"
                   >
-                    <h1 className="text-lg font-semibold truncate">
-                      {displayTitle}
+                    <h1 className="text-lg font-semibold truncate max-w-32">
+                      {displayContent.title}
                     </h1>
-                    <svg 
-                      className={`w-4 h-4 transition-transform duration-200 flex-shrink-0 ${isDropdownOpen ? 'rotate-180' : ''}`}
-                      fill="none" 
-                      stroke="currentColor" 
-                      viewBox="0 0 24 24"
-                    >
-                      <path 
-                        strokeLinecap="round" 
-                        strokeLinejoin="round" 
-                        strokeWidth={2} 
-                        d="M19 9l-7 7-7-7" 
-                      />
-                    </svg>
+                    <ChevronDownIcon 
+                      className="flex-shrink-0 text-text-secondary" 
+                      isOpen={isDropdownOpen}
+                    />
+                    {/* Subtle glow effect when open */}
+                    <span className={`absolute inset-0 rounded-lg bg-primary-200 transition-opacity duration-300 ${isDropdownOpen ? 'opacity-10' : 'opacity-0'}`} />
                   </button>
+
+                  {/* Enhanced Dropdown Menu */}
+                  {isDropdownOpen && (
+                    <>
+                      {/* Backdrop with smooth fade */}
+                      <div 
+                        className="fixed inset-0 z-10 bg-black/5 transition-opacity duration-200"
+                        onClick={closeDropdown}
+                        aria-hidden="true"
+                      />
+                      
+                      {/* Dropdown Content with improved animations */}
+                      <div className="absolute top-full left-1/2 transform -translate-x-1/2 mt-2 w-72 bg-white border border-gray-200 rounded-xl shadow-xl z-20 animate-in slide-in-from-top-2 duration-200 overflow-hidden">
+                        <div className="py-2">
+                          {/* Header */}
+                          <div className="px-4 py-3 text-xs font-medium text-text-secondary uppercase tracking-wide border-b border-gray-100 bg-gray-50">
+                            Cambiar mentor
+                          </div>
+                          
+                          {/* Mentor List */}
+                          <div className="max-h-64 overflow-y-auto">
+                            {allMentors.map((mentor, index) => (
+                              <button
+                                key={mentor.id}
+                                onClick={() => handleMentorSwitch(mentor.id)}
+                                disabled={isNavigating}
+                                className={`w-full flex items-center px-4 py-3 text-sm transition-all duration-200 hover:bg-primary-50 focus:bg-primary-50 focus:outline-none group ${
+                                  activeMentorId === mentor.id 
+                                    ? 'bg-primary-50 text-primary border-r-4 border-primary' 
+                                    : 'text-text-primary hover:text-primary'
+                                } ${isNavigating ? 'opacity-50' : ''}`}
+                                style={{ animationDelay: `${index * 50}ms` }}
+                              >
+                                <div className="flex-1 text-left">
+                                  <div className="font-medium truncate group-hover:translate-x-1 transition-transform duration-200">
+                                    {mentor.name}
+                                  </div>
+                                  <div className="text-xs text-text-secondary truncate">
+                                    {mentor.subject}
+                                  </div>
+                                </div>
+                                {activeMentorId === mentor.id && (
+                                  <CheckIcon className="text-primary ml-3 animate-in spin-in-90 duration-300" />
+                                )}
+                              </button>
+                            ))}
+                          </div>
+                          
+                          {/* Footer Action */}
+                          <div className="border-t border-gray-100 mt-1">
+                            <button
+                              onClick={() => {
+                                navigate('/mentors');
+                                closeDropdown();
+                              }}
+                              disabled={isNavigating}
+                              className="w-full flex items-center px-4 py-3 text-sm text-text-secondary hover:bg-gray-50 hover:text-primary transition-all duration-200 group"
+                            >
+                              <PlusIcon className="mr-3 group-hover:rotate-90 transition-transform duration-300" />
+                              <span className="group-hover:translate-x-1 transition-transform duration-200">
+                                Ver todos los mentores
+                              </span>
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    </>
+                  )}
                 </div>
               ) : (
-                <h1 className="text-lg font-semibold text-text-primary truncate">
-                  {displayTitle}
+                <h1 className="text-lg font-semibold text-text-primary truncate transition-colors duration-200">
+                  {displayContent.title}
                 </h1>
-              )}
-              
-              {/* Dropdown Menu */}
-              {isMentorDashboard && allMentors.length > 1 && isDropdownOpen && (
-                <>
-                  {/* Backdrop */}
-                  <div 
-                    className="fixed inset-0 z-10"
-                    onClick={() => setIsDropdownOpen(false)}
-                  />
-                  
-                  {/* Dropdown Content */}
-                  <div className="absolute top-full left-1/2 transform -translate-x-1/2 mt-1 w-64 bg-surface border border-gray-200 rounded-lg shadow-lg z-20 animate-fade-in">
-                    <div className="py-2">
-                      <div className="px-3 py-2 text-xs font-medium text-text-secondary uppercase tracking-wide border-b border-gray-100">
-                        Cambiar mentor
-                      </div>
-                      {allMentors.map((mentor) => (
-                        <button
-                          key={mentor.id}
-                          onClick={() => handleMentorSwitch(mentor.id)}
-                          className={`w-full flex items-center px-3 py-3 text-sm transition-colors duration-150 ${
-                            activeMentorId === mentor.id 
-                              ? 'bg-primary-50 text-primary border-r-2 border-primary' 
-                              : 'text-text-primary hover:bg-primary-50 hover:text-primary'
-                          }`}
-                        >
-                          <div className="flex-1 text-left">
-                            <div className="font-medium truncate">{mentor.name}</div>
-                            <div className="text-xs text-text-secondary truncate">{mentor.subject}</div>
-                          </div>
-                          {activeMentorId === mentor.id && (
-                            <svg className="w-4 h-4 text-primary ml-2" fill="currentColor" viewBox="0 0 20 20">
-                              <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                            </svg>
-                          )}
-                        </button>
-                      ))}
-                      <div className="border-t border-gray-100 mt-1 pt-1">
-                        <button
-                          onClick={() => {
-                            navigate('/mentors');
-                            setIsDropdownOpen(false);
-                          }}
-                          className="w-full flex items-center px-3 py-2 text-sm text-text-secondary hover:bg-gray-50 transition-colors duration-150"
-                        >
-                          <svg className="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                          </svg>
-                          <span>Ver todos los mentores</span>
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                </>
               )}
             </div>
             
-            {displaySubtitle && (
-              <p className="text-sm text-text-secondary truncate text-center">
-                {displaySubtitle}
+            {/* Subtitle with fade animation */}
+            {displayContent.subtitle && (
+              <p className="text-sm text-text-secondary truncate text-center mt-0.5 animate-in fade-in duration-300">
+                {displayContent.subtitle}
               </p>
             )}
           </div>
         </div>
         
-        {/* Right section - Profile icon */}
+        {/* Right section - Profile */}
         <div className="flex items-center">
           <button 
             onClick={handleProfileClick}
-            className="p-2 text-text-secondary hover:text-primary transition-colors duration-200 
-            hover:bg-primary-50 rounded-lg">
-            <img src="/icons/profile.svg" alt="Perfil" className="w-5 h-5" />
+            disabled={isNavigating}
+            className={`${iconButtonStyles} ${isNavigating ? 'scale-95 opacity-75' : ''} ${location.pathname === '/profile' ? 'bg-primary-50 text-primary' : ''}`}
+            aria-label="Ir al perfil"
+          >
+            <img 
+              src="/icons/profile.svg" 
+              alt="" 
+              className="w-5 h-5 transition-transform duration-200"
+            />
+            <span className="absolute inset-0 rounded-lg bg-primary-100 opacity-0 hover:opacity-20 transition-opacity duration-200" />
           </button>
         </div>
       </div>

@@ -16,6 +16,7 @@ const Header = ({ title, subtitle, className = '', ...props }) => {
   // Check if we're on different pages
   const isMentorDashboard = location.pathname.startsWith('/mentor/');
   const isMentorHub = location.pathname === '/mentors';
+  const isProfile = location.pathname === '/profile';
   
   // Always call useSelector, but make it return null when not needed
   const currentMentor = useSelector(state => {
@@ -30,7 +31,11 @@ const Header = ({ title, subtitle, className = '', ...props }) => {
   const displaySubtitle = subtitle || (currentMentor ? currentMentor.subject : undefined);
 
   const handleBackClick = () => {
-    navigate('/mentors');
+    if (isProfile) {
+      navigate(-1); // Go back to the last visited page
+    } else {
+      navigate('/mentors'); // For mentor dashboard, go to mentors hub
+    }
   };
 
   const handleMentorSwitch = (mentorId) => {
@@ -40,6 +45,10 @@ const Header = ({ title, subtitle, className = '', ...props }) => {
 
   const toggleDropdown = () => {
     setIsDropdownOpen(!isDropdownOpen);
+  };
+
+  const handleProfileClick = () => {
+    navigate('/profile');
   };
 
   // Enhanced header for MentorHub
@@ -57,38 +66,21 @@ const Header = ({ title, subtitle, className = '', ...props }) => {
               </svg>
             </div>
             
-            {/* Title and subtitle */}
+            {/* Title */}
             <div>
-              <h1 className="text-xl font-bold text-text-primary">
-                {displayTitle}
+              <h1 className="text-lg font-semibold text-text-primary">
+                Mis Mentores
               </h1>
-              <p className="text-xs text-text-secondary -mt-0.5">
-                Compañeros IA de estudio
-              </p>
             </div>
           </div>
 
-          {/* Right section - Actions */}
-          <div className="flex items-center space-x-3">
-            {/* Notifications bell */}
-            <button className="relative p-2.5 text-text-secondary hover:text-primary transition-colors duration-200 
-              hover:bg-primary-50 rounded-xl group">
-              <img src="/icons/bell.svg" alt="Notificaciones" className="w-5 h-5" />
-              
-              {/* Notification dot */}
-              <div className="absolute top-1.5 right-1.5 w-2 h-2 bg-accent-500 rounded-full 
-                animate-pulse ring-1 ring-white shadow-sm" />
-                
-              {/* Tooltip on hover */}
-              <div className="absolute right-0 top-full mt-2 px-2 py-1 bg-gray-900 text-white text-xs rounded 
-                opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap">
-                Notificaciones
-              </div>
-            </button>
-
+          {/* Right section - Profile only */}
+          <div className="flex items-center">
             {/* Profile menu */}
-            <button className="p-2.5 text-text-secondary hover:text-primary transition-colors duration-200 
-              hover:bg-primary-50 rounded-xl">
+            <button 
+              onClick={handleProfileClick}
+              className="p-2 text-text-secondary hover:text-primary transition-colors duration-200 
+              hover:bg-primary-50 rounded-lg">
               <img src="/icons/profile.svg" alt="Perfil" className="w-5 h-5" />
             </button>
           </div>
@@ -100,13 +92,14 @@ const Header = ({ title, subtitle, className = '', ...props }) => {
   // Standard header for other pages
   return (
     <header 
-      className={`bg-surface shadow-sm border-b border-gray-100 px-4 py-3 relative ${className}`}
+      className={`bg-surface shadow-sm border-b border-gray-100 px-4 py-4 relative ${className}`}
       {...props}
     >
       <div className="flex items-center justify-between">
-        <div className="flex items-center space-x-3 flex-1">
-          {/* Back Button - Only show on MentorDashboard */}
-          {isMentorDashboard && (
+        {/* Left section - Back button */}
+        <div className="flex items-center">
+          {/* Back Button - Show on MentorDashboard and Profile */}
+          {(isMentorDashboard || isProfile) && (
             <button
               onClick={handleBackClick}
               className="p-2 text-text-secondary hover:text-primary transition-colors duration-200 hover:bg-primary-50 rounded-lg"
@@ -126,9 +119,11 @@ const Header = ({ title, subtitle, className = '', ...props }) => {
               </svg>
             </button>
           )}
+        </div>
 
-          {/* Title and Subtitle */}
-          <div className="flex-1 min-w-0">
+        {/* Center section - Title and Mentor Switcher */}
+        <div className="flex-1 flex justify-center">
+          <div className="flex flex-col items-center min-w-0">
             <div className="flex items-center space-x-2">
               <h1 className="text-lg font-semibold text-text-primary truncate">
                 {displayTitle}
@@ -166,7 +161,7 @@ const Header = ({ title, subtitle, className = '', ...props }) => {
                       />
                       
                       {/* Dropdown Content */}
-                      <div className="absolute top-full left-0 mt-1 w-64 bg-surface border border-gray-200 rounded-lg shadow-lg z-20 animate-fade-in">
+                      <div className="absolute top-full left-1/2 transform -translate-x-1/2 mt-1 w-64 bg-surface border border-gray-200 rounded-lg shadow-lg z-20 animate-fade-in">
                         <div className="py-2">
                           <div className="px-3 py-2 text-xs font-medium text-text-secondary uppercase tracking-wide border-b border-gray-100">
                             Cambiar mentor
@@ -216,23 +211,20 @@ const Header = ({ title, subtitle, className = '', ...props }) => {
             </div>
             
             {displaySubtitle && (
-              <p className="text-sm text-text-secondary truncate">
+              <p className="text-sm text-text-secondary truncate text-center">
                 {displaySubtitle}
               </p>
             )}
           </div>
         </div>
         
-        {/* Action buttons for other pages */}
-        <div className="flex items-center space-x-2">
-          {/* Notifications bell for other pages */}
-          <button className="relative p-2 text-text-secondary hover:text-primary transition-colors duration-200 
-            hover:bg-primary-50 rounded-lg group">
-            <img src="/icons/bell.svg" alt="Notificaciones" className="w-5 h-5" />
-            
-            {/* Notification dot */}
-            <div className="absolute top-1 right-1 w-2 h-2 bg-accent-500 rounded-full 
-              animate-pulse ring-1 ring-white shadow-sm" />
+        {/* Right section - Profile icon */}
+        <div className="flex items-center">
+          <button 
+            onClick={handleProfileClick}
+            className="p-2 text-text-secondary hover:text-primary transition-colors duration-200 
+            hover:bg-primary-50 rounded-lg">
+            <img src="/icons/profile.svg" alt="Perfil" className="w-5 h-5" />
           </button>
         </div>
       </div>

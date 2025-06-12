@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import Button from '../common/Button';
+import ChatInput from './ChatInput';
 
 // Constants for better maintainability
 const BOTTOM_NAV_HEIGHT = 80; // Height of BottomNavBar (8px + 56px + 8px + 8px)
@@ -83,23 +83,11 @@ const ChatInterface = ({ className = '' }) => {
     }, delay);
   };
 
-  const handleKeyPress = (e) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault();
-      handleSendMessage();
-    }
-  };
-
   const formatTimestamp = (timestamp) => {
     return timestamp.toLocaleTimeString('es-ES', { 
       hour: '2-digit', 
       minute: '2-digit' 
     });
-  };
-
-  const handleTextAreaInput = (e) => {
-    e.target.style.height = `${INPUT_MIN_HEIGHT}px`;
-    e.target.style.height = Math.min(e.target.scrollHeight, INPUT_MAX_HEIGHT) + 'px';
   };
 
   return (
@@ -162,40 +150,13 @@ const ChatInterface = ({ className = '' }) => {
         </div>
       </div>
 
-      {/* Fixed positioned input above BottomNavBar */}
-      <div 
-        className="fixed left-0 right-0 bg-white border-t border-gray-200 px-4 py-3 z-40"
-        style={{ 
-          bottom: `calc(${BOTTOM_NAV_HEIGHT}px + env(safe-area-inset-bottom, 0px))`
-        }}
-      >
-        <div className="flex space-x-3 items-end max-w-4xl mx-auto">
-          <div className="flex-1 flex items-end">
-            <textarea
-              value={inputText}
-              onChange={(e) => setInputText(e.target.value)}
-              onKeyPress={handleKeyPress}
-              onInput={handleTextAreaInput}
-              placeholder="Escribe tu pregunta..."
-              className="w-full resize-none border border-gray-300 rounded-2xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-200 max-h-32 overflow-hidden shadow-sm"
-              rows="1"
-              style={{ height: `${INPUT_MIN_HEIGHT}px`, minHeight: `${INPUT_MIN_HEIGHT}px` }}
-              aria-label="Escribe tu mensaje al mentor"
-            />
-          </div>
-          <Button
-            onClick={handleSendMessage}
-            disabled={!inputText.trim() || isTyping}
-            className="rounded-2xl flex items-center justify-center p-0 bg-primary hover:bg-primary-600 disabled:bg-gray-300 disabled:cursor-not-allowed transition-all duration-200 shadow-sm hover:shadow-md border border-primary hover:border-primary-600 disabled:border-gray-300 flex-shrink-0"
-            style={{ width: `${INPUT_MIN_HEIGHT}px`, height: `${INPUT_MIN_HEIGHT}px`, minHeight: `${INPUT_MIN_HEIGHT}px` }}
-            aria-label="Enviar mensaje"
-          >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
-            </svg>
-          </Button>
-        </div>
-      </div>
+      {/* Chat Input Component */}
+      <ChatInput
+        inputText={inputText}
+        setInputText={setInputText}
+        onSendMessage={handleSendMessage}
+        isTyping={isTyping}
+      />
     </div>
   );
 };

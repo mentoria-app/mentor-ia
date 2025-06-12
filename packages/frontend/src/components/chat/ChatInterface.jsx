@@ -1,6 +1,14 @@
 import React, { useState, useRef, useEffect } from 'react';
 import Button from '../common/Button';
 
+// Constants for better maintainability
+const BOTTOM_NAV_HEIGHT = 80; // Height of BottomNavBar (8px + 56px + 8px + 8px)
+const TYPING_DELAY_MIN = 1000;
+const TYPING_DELAY_MAX = 2000;
+const INPUT_MIN_HEIGHT = 44;
+const INPUT_MAX_HEIGHT = 128;
+const MESSAGES_BOTTOM_PADDING = 80; // 20 * 4 (pb-20)
+
 const INITIAL_MESSAGE = {
   id: 1,
   type: 'mentor',
@@ -66,11 +74,13 @@ const ChatInterface = ({ className = '' }) => {
     setInputText('');
     setIsTyping(true);
 
+    // Simulate AI response with random delay
+    const delay = TYPING_DELAY_MIN + Math.random() * (TYPING_DELAY_MAX - TYPING_DELAY_MIN);
     setTimeout(() => {
       const mentorResponse = generateMentorResponse();
       setMessages(prev => [...prev, mentorResponse]);
       setIsTyping(false);
-    }, 1000 + Math.random() * 1000);
+    }, delay);
   };
 
   const handleKeyPress = (e) => {
@@ -88,13 +98,13 @@ const ChatInterface = ({ className = '' }) => {
   };
 
   const handleTextAreaInput = (e) => {
-    e.target.style.height = '44px';
-    e.target.style.height = Math.min(e.target.scrollHeight, 128) + 'px';
+    e.target.style.height = `${INPUT_MIN_HEIGHT}px`;
+    e.target.style.height = Math.min(e.target.scrollHeight, INPUT_MAX_HEIGHT) + 'px';
   };
 
   return (
-    <div className={`fixed inset-0 flex flex-col bg-gray-50 ${className}`} style={{ top: '200px', bottom: '68px' }}>
-      <div className="flex-1 overflow-y-auto scroll-smooth">
+    <div className={`flex flex-col h-full bg-gray-50 ${className}`}>
+      <div className="flex-1 overflow-y-auto scroll-smooth pb-20">
         <div className="px-4 py-6 space-y-6">
           {messages.map((message) => (
             <div
@@ -152,7 +162,13 @@ const ChatInterface = ({ className = '' }) => {
         </div>
       </div>
 
-      <div className="bg-white border-t border-gray-200 px-4 py-3">
+      {/* Fixed positioned input above BottomNavBar */}
+      <div 
+        className="fixed left-0 right-0 bg-white border-t border-gray-200 px-4 py-3 z-40"
+        style={{ 
+          bottom: `calc(${BOTTOM_NAV_HEIGHT}px + env(safe-area-inset-bottom, 0px))`
+        }}
+      >
         <div className="flex space-x-3 items-end max-w-4xl mx-auto">
           <div className="flex-1 flex items-end">
             <textarea
@@ -163,14 +179,16 @@ const ChatInterface = ({ className = '' }) => {
               placeholder="Escribe tu pregunta..."
               className="w-full resize-none border border-gray-300 rounded-2xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-200 max-h-32 overflow-hidden shadow-sm"
               rows="1"
-              style={{ height: '44px', minHeight: '44px' }}
+              style={{ height: `${INPUT_MIN_HEIGHT}px`, minHeight: `${INPUT_MIN_HEIGHT}px` }}
+              aria-label="Escribe tu mensaje al mentor"
             />
           </div>
           <Button
             onClick={handleSendMessage}
             disabled={!inputText.trim() || isTyping}
             className="rounded-2xl flex items-center justify-center p-0 bg-primary hover:bg-primary-600 disabled:bg-gray-300 disabled:cursor-not-allowed transition-all duration-200 shadow-sm hover:shadow-md border border-primary hover:border-primary-600 disabled:border-gray-300 flex-shrink-0"
-            style={{ width: '44px', height: '44px', minHeight: '44px' }}
+            style={{ width: `${INPUT_MIN_HEIGHT}px`, height: `${INPUT_MIN_HEIGHT}px`, minHeight: `${INPUT_MIN_HEIGHT}px` }}
+            aria-label="Enviar mensaje"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />

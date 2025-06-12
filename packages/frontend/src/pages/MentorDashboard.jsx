@@ -115,7 +115,9 @@ const MentorDashboard = ({ activeTab = 'resources' }) => {
     switch (activeTab) {
       case 'chat':
         return (
-          <ChatInterface />
+          <div className="h-full">
+            <ChatInterface />
+          </div>
         );
         
       case 'quiz':

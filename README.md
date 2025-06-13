@@ -13,8 +13,6 @@
 - Upload **PDFs, images, YouTube links** – all languages, Spanish answers.
 - Chat with a **RAG-powered tutor** that cites your own notes.
 - **Flash-cards** & **5-question quizzes** generated on-the-fly.
-- Works offline as a Progressive Web App; installs to home screen in two taps.
-- WhatsApp share-link virality loop.
 
 ## 🏗️ Tech Stack
 | Front-end | Back-end | AI / Data |

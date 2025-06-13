@@ -31,8 +31,8 @@ let mockMentors = [
     id: 1,
     name: 'Matemáticas',
     expertise: 'Álgebra y Cálculo',
-    avatar_url: null,
-    color: 'bg-primary',
+    avatar_url: '/assets/avatars/scientist.png',
+    color: null,
     description: 'Tu mentor especializado en matemáticas avanzadas',
     createdAt: '2024-01-15T10:00:00Z',
     updatedAt: '2024-01-20T15:30:00Z',
@@ -61,8 +61,8 @@ let mockMentors = [
     id: 2,
     name: 'Historia',
     expertise: 'Historia Universal',
-    avatar_url: null,
-    color: 'bg-secondary',
+    avatar_url: '/assets/avatars/trainer.png',
+    color: null,
     description: 'Tu mentor especializado en historia mundial',
     createdAt: '2024-01-10T09:00:00Z',
     updatedAt: '2024-01-18T12:15:00Z',
@@ -82,8 +82,8 @@ let mockMentors = [
     id: 3,
     name: 'Biología',
     expertise: 'Biología Celular',
-    avatar_url: null,
-    color: 'bg-purple-500',
+    avatar_url: '/assets/avatars/doctor.png',
+    color: null,
     description: 'Tu mentor especializado en biología y ciencias de la vida',
     createdAt: '2024-01-08T14:20:00Z',
     updatedAt: '2024-01-22T11:45:00Z',
@@ -172,8 +172,7 @@ export const createMentor = async (mentorData) => {
       name: mentorData.name,
       expertise: mentorData.expertise,
       description: mentorData.description,
-      color: mentorData.color,
-      avatar_url: mentorData.avatar_url
+      avatar_url: mentorData.avatar_url || '/assets/avatars/default.png'
     });
     
     return response.data;

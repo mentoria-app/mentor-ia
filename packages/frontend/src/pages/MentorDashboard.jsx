@@ -4,6 +4,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { Card, Avatar, Button, QuizGenerationModal, FlashcardGenerationModal } from '../components/common';
 import { ResourceCard } from '../components/resources';
 import { ChatInterface } from '../components/chat';
+import { DEFAULT_AVATAR } from '../constants/avatars';
 import { 
   selectMentorById, 
   selectActiveMentorId, 
@@ -263,20 +264,13 @@ const MentorDashboard = ({ activeTab = 'resources' }) => {
         <div className="flex-shrink-0 bg-gradient-to-r from-blue-500 to-blue-600 text-white p-6">
           <div className="flex items-center space-x-4">
             <div className="flex-shrink-0">
-              {mentor.avatar_url ? (
-                <Avatar 
-                  src={mentor.avatar_url} 
-                  size="xl" 
-                  alt={mentor.name}
-                  className="border-4 border-white"
-                />
-              ) : (
-                <div className={`w-16 h-16 ${mentor.color} rounded-full flex items-center justify-center border-4 border-white`}>
-                  <span className="text-white text-2xl font-bold">
-                    {mentor.name.charAt(0)}
-                  </span>
-                </div>
-              )}
+              <Avatar 
+                src={mentor.avatar_url || DEFAULT_AVATAR} 
+                size="xl" 
+                alt={mentor.name}
+                rounded="lg"
+                className="border-4 border-white"
+              />
             </div>
 
             <div className="flex-1 min-w-0">

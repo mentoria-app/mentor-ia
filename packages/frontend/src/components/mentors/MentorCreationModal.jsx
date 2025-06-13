@@ -1,33 +1,51 @@
 import React, { useState } from 'react';
 import { useDispatch } from 'react-redux';
+import PropTypes from 'prop-types';
 import { Modal, Button } from '../common';
 import { closeMentorCreationModal, createMentor } from '../../state';
+import { AVATAR_OPTIONS, getAvatarUrl } from '../../constants/avatars';
 
+const INITIAL_FORM_DATA = {
+  name: '',
+  subject: '',
+  description: '',
+  avatar: 'default'
+};
+
+/**
+ * MentorCreationModal Component
+ * 
+ * A modal component for creating new mentors with form validation,
+ * avatar selection, and Redux state management.
+ * 
+ * Features:
+ * - Form validation for required fields
+ * - Avatar selection with visual feedback
+ * - Automatic description generation
+ * - Error handling for creation failures
+ * - Accessibility attributes for screen readers
+ * 
+ * @component
+ * @param {Object} props - Component props
+ * @param {boolean} props.isOpen - Controls modal visibility
+ * @returns {JSX.Element} The mentor creation modal
+ */
 const MentorCreationModal = ({ isOpen }) => {
   const dispatch = useDispatch();
-  const [formData, setFormData] = useState({
-    name: '',
-    subject: '',
-    color: 'bg-primary',
-    description: ''
-  });
+  const [formData, setFormData] = useState(INITIAL_FORM_DATA);
 
-  const colorOptions = [
-    { value: 'bg-primary', color: '#3b82f6' },
-    { value: 'bg-secondary', color: '#10b981' },
-    { value: 'bg-purple-500', color: '#8b5cf6' },
-    { value: 'bg-red-500', color: '#ef4444' },
-    { value: 'bg-yellow-500', color: '#eab308' },
-    { value: 'bg-indigo-500', color: '#6366f1' },
-    { value: 'bg-pink-500', color: '#ec4899' },
-    { value: 'bg-orange-500', color: '#f97316' }
-  ];
-
+  /**
+   * Handles modal closure and form reset
+   */
   const handleClose = () => {
     dispatch(closeMentorCreationModal());
-    setFormData({ name: '', subject: '', color: 'bg-primary', description: '' });
+    setFormData(INITIAL_FORM_DATA);
   };
 
+  /**
+   * Handles input field changes
+   * @param {Event} e - Input change event
+   */
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({
@@ -36,32 +54,37 @@ const MentorCreationModal = ({ isOpen }) => {
     }));
   };
 
-  const handleColorSelect = (colorValue) => {
+  /**
+   * Handles avatar selection
+   * @param {string} avatarId - Selected avatar ID
+   */
+  const handleAvatarSelect = (avatarId) => {
     setFormData(prev => ({
       ...prev,
-      color: colorValue
+      avatar: avatarId
     }));
   };
 
+  /**
+   * Handles form submission and mentor creation
+   * @param {Event} e - Form submit event
+   */
   const handleSubmit = async (e) => {
     e.preventDefault();
     
     if (formData.name.trim() && formData.subject.trim()) {
       try {
-        // Dispatch async thunk to create new mentor
         await dispatch(createMentor({
           name: formData.name.trim(),
-          expertise: formData.subject.trim(), // Map subject to expertise for backend
-          color: formData.color,
+          expertise: formData.subject.trim(),
           description: formData.description.trim() || `Tu mentor especializado en ${formData.subject.toLowerCase()}`,
-          avatar_url: null // Use snake_case for backend
+          avatar_url: getAvatarUrl(formData.avatar)
         })).unwrap();
         
-        // Close modal and reset form only on success
         handleClose();
       } catch (error) {
-        // Error is handled by the Redux state
         console.error('Error creating mentor:', error);
+        // Error handling is managed by Redux state
       }
     }
   };
@@ -77,6 +100,7 @@ const MentorCreationModal = ({ isOpen }) => {
           <button
             onClick={handleClose}
             className="p-2 text-text-secondary hover:text-text-primary transition-colors rounded-lg hover:bg-gray-100"
+            aria-label="Cerrar modal"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -136,27 +160,31 @@ const MentorCreationModal = ({ isOpen }) => {
             />
           </div>
 
-          {/* Color Selection */}
+          {/* Avatar Selection */}
           <div>
             <label className="block text-sm font-medium text-text-primary mb-3">
-              Color del Avatar
+              Avatar (Opcional)
             </label>
             <div className="grid grid-cols-4 gap-3">
-              {colorOptions.map((option) => (
+              {AVATAR_OPTIONS.map((option) => (
                 <button
-                  key={option.value}
+                  key={option.id}
                   type="button"
-                  onClick={() => handleColorSelect(option.value)}
-                  className={`p-3 rounded-lg border-2 transition-all ${
-                    formData.color === option.value 
+                  onClick={() => handleAvatarSelect(option.id)}
+                  className={`p-2 rounded-lg border-2 transition-all ${
+                    formData.avatar === option.id 
                       ? 'border-primary ring-2 ring-primary ring-opacity-20' 
                       : 'border-gray-200 hover:border-gray-300'
                   }`}
+                  aria-label={`Seleccionar avatar ${option.label}`}
                 >
                   <div className="flex flex-col items-center space-y-1">
-                    <div 
-                      className={`w-8 h-8 ${option.value} rounded-full`}
+                    <img 
+                      src={option.image} 
+                      alt={option.label}
+                      className="w-12 h-12 object-cover rounded-full"
                     />
+                    <span className="text-xs text-text-secondary">{option.label}</span>
                   </div>
                 </button>
               ))}
@@ -185,6 +213,10 @@ const MentorCreationModal = ({ isOpen }) => {
       </div>
     </Modal>
   );
+};
+
+MentorCreationModal.propTypes = {
+  isOpen: PropTypes.bool.isRequired
 };
 
 export default MentorCreationModal; 

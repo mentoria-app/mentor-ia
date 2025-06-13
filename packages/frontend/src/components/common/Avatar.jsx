@@ -1,7 +1,16 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-const Avatar = ({ src, size = 'md', alt = 'Avatar', rounded = 'full', className = '', style = {}, ...props }) => {
+const Avatar = ({ 
+  src, 
+  size = 'md', 
+  alt = 'Avatar', 
+  rounded = 'full', 
+  className = '', 
+  style = {},
+  loading = 'lazy',
+  ...props 
+}) => {
   const sizeClasses = {
     sm: 'w-8 h-8',
     md: 'w-12 h-12',
@@ -25,6 +34,7 @@ const Avatar = ({ src, size = 'md', alt = 'Avatar', rounded = 'full', className 
     <img
       src={src}
       alt={alt}
+      loading={loading}
       className={`object-cover ${sizeClass} ${roundedClass} ${className}`}
       style={style}
       {...props}
@@ -38,7 +48,8 @@ Avatar.propTypes = {
   alt: PropTypes.string,
   rounded: PropTypes.oneOf(['full', 'lg', 'md', 'sm', 'none']),
   className: PropTypes.string,
-  style: PropTypes.object
+  style: PropTypes.object,
+  loading: PropTypes.oneOf(['lazy', 'eager'])
 };
 
 export default Avatar; 

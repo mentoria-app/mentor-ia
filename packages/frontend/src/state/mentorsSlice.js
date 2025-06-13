@@ -72,7 +72,7 @@ const initialMentors = [
     id: 1,
     name: 'Matemáticas',
     expertise: 'Álgebra y Cálculo',
-    avatar_url: '/assets/avatars/scientist.png',
+    avatar_url: '/assets/avatars/scientist.webp',
     color: null,
     description: 'Tu mentor especializado en matemáticas avanzadas',
     resources: [
@@ -100,7 +100,7 @@ const initialMentors = [
     id: 2,
     name: 'Historia',
     expertise: 'Historia Universal',
-    avatar_url: '/assets/avatars/trainer.png',
+    avatar_url: '/assets/avatars/trainer.webp',
     color: null, 
     description: 'Tu mentor especializado en historia mundial',
     resources: [
@@ -119,7 +119,7 @@ const initialMentors = [
     id: 3,
     name: 'Biología',
     expertise: 'Biología Celular',
-    avatar_url: '/assets/avatars/doctor.png',
+    avatar_url: '/assets/avatars/doctor.webp',
     color: null, 
     description: 'Tu mentor especializado en biología y ciencias de la vida',
     resources: [

@@ -94,7 +94,7 @@ const MentorCreationModal = ({ isOpen }) => {
       <div className="p-6">
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
-          <h2 className="text-xl font-bold text-text-primary">
+          <h2 className="heading-sm text-text-primary">
             Crear Nuevo Mentor
           </h2>
           <button
@@ -112,7 +112,7 @@ const MentorCreationModal = ({ isOpen }) => {
         <form onSubmit={handleSubmit} className="space-y-5">
           {/* Mentor Name */}
           <div>
-            <label htmlFor="name" className="block text-sm font-medium text-text-primary mb-2">
+            <label htmlFor="name" className="block label text-text-primary mb-2">
               Nombre del Mentor *
             </label>
             <input
@@ -129,7 +129,7 @@ const MentorCreationModal = ({ isOpen }) => {
 
           {/* Subject */}
           <div>
-            <label htmlFor="subject" className="block text-sm font-medium text-text-primary mb-2">
+            <label htmlFor="subject" className="block label text-text-primary mb-2">
               Materia o Especialidad *
             </label>
             <input
@@ -146,7 +146,7 @@ const MentorCreationModal = ({ isOpen }) => {
 
           {/* Description */}
           <div>
-            <label htmlFor="description" className="block text-sm font-medium text-text-primary mb-2">
+            <label htmlFor="description" className="block label text-text-primary mb-2">
               Descripción (Opcional)
             </label>
             <textarea
@@ -162,7 +162,7 @@ const MentorCreationModal = ({ isOpen }) => {
 
           {/* Avatar Selection */}
           <div>
-            <label className="block text-sm font-medium text-text-primary mb-3">
+            <label className="block label text-text-primary mb-3">
               Avatar (Opcional)
             </label>
             <div className="grid grid-cols-4 gap-3">
@@ -184,7 +184,7 @@ const MentorCreationModal = ({ isOpen }) => {
                       alt={option.label}
                       className="w-12 h-12 object-cover rounded-full"
                     />
-                    <span className="text-xs text-text-secondary">{option.label}</span>
+                    <span className="caption text-text-secondary">{option.label}</span>
                   </div>
                 </button>
               ))}

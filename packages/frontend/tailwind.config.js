@@ -74,7 +74,10 @@ export default {
         },
       },
       fontFamily: {
-        sans: ['Inter', 'system-ui', 'sans-serif'],
+        sans: ['Inter', 'system-ui', 'sans-serif'],        // Body text, captions
+        heading: ['Poppins', 'system-ui', 'sans-serif'],   // Headings
+        body: ['Inter', 'system-ui', 'sans-serif'],        // Explicit body text
+        caption: ['Inter', 'system-ui', 'sans-serif'],     // Captions and notes
       },
       animation: {
         'fade-in': 'fadeIn 0.2s ease-in-out',

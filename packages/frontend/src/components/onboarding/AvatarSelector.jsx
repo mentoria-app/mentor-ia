@@ -57,7 +57,7 @@ const AvatarSelector = ({ selectedAvatar, onSelectAvatar }) => {
 
   return (
     <div>
-      <label className="block text-sm font-medium text-gray-700 mb-3">
+      <label className="block label text-gray-700 mb-3">
         Elige un Avatar
       </label>
       <div className="grid grid-cols-3 gap-2" role="radiogroup" aria-label="Selección de avatar">
@@ -84,7 +84,7 @@ const AvatarSelector = ({ selectedAvatar, onSelectAvatar }) => {
             >
               <span className={avatar.iconColor}>{avatar.icon}</span>
             </div>
-            <p className="text-xs text-gray-700 font-medium truncate">
+            <p className="caption text-gray-700 font-medium truncate">
               {avatar.name}
             </p>
           </button>

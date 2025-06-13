@@ -110,33 +110,33 @@ const ResourceCard = ({ resource, onClick, className = '', ...props }) => {
             />
           ) : (
             <div className={`w-12 h-12 rounded-lg flex items-center justify-center ${getTypeColor(type)}`}>
-              <span className="text-lg">{getTypeIcon(type)}</span>
+              <span className="heading-xs">{getTypeIcon(type)}</span>
             </div>
           )}
         </div>
 
         {/* Resource Info */}
         <div className="flex-1 min-w-0">
-          <h4 className="font-medium text-gray-900 truncate">
+          <h4 className="label text-gray-900 truncate">
             {displayTitle}
           </h4>
           <div className="flex items-center space-x-2 mt-1">
-            <span className="text-xs text-gray-500 uppercase">
+            <span className="caption text-gray-500 uppercase">
               {type || 'archivo'}
             </span>
             {size && (
               <>
                 <span className="text-gray-300">•</span>
-                <span className="text-xs text-gray-500">{size}</span>
+                <span className="caption text-gray-500">{size}</span>
               </>
             )}
             <span className="text-gray-300">•</span>
-            <span className={`text-xs px-2 py-1 rounded-full font-medium ${getStatusColor(status)}`}>
+            <span className={`caption px-2 py-1 rounded-full font-medium ${getStatusColor(status)}`}>
               {getStatusLabel(status)}
             </span>
           </div>
           {displayDate && (
-            <p className="text-xs text-gray-400 mt-1">
+            <p className="caption text-gray-400 mt-1">
               {formatDate(displayDate)}
             </p>
           )}

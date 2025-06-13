@@ -37,7 +37,7 @@ const CreateMentorCard = ({ onClick, className = '', ...props }) => {
 
         {/* Text */}
         <div>
-          <h3 className="font-semibold text-gray-600 text-base group-hover:text-primary-600 transition-colors duration-300">
+          <h3 className="heading-xs text-gray-600 group-hover:text-primary-600 transition-colors duration-300">
             Crear Mentor
           </h3>
         </div>

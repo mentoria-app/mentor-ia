@@ -33,7 +33,7 @@ const FloatingActionButton = ({
         ${sizeClasses[size]}
         ${variantClasses[variant]}
         fixed bottom-6 right-4 z-30
-        rounded-2xl font-semibold
+        rounded-2xl button-text font-semibold
         transition-all duration-300 ease-out
         hover:scale-110 hover:-translate-y-1
         active:scale-95 active:duration-75

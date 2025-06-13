@@ -140,7 +140,7 @@ const BottomNavBar = ({ activeTab, onTabChange, className = '', ...props }) => {
                 )}
               </svg>
             </div>
-            <span className={`text-xs transition-all duration-300 ease-out leading-tight text-center block max-w-full ${
+            <span className={`caption transition-all duration-300 ease-out leading-tight text-center block max-w-full ${
               activeTab === item.id ? 'font-semibold' : 'font-medium'
             }`}>
               {item.label}

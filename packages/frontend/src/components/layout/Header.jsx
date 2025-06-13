@@ -208,7 +208,7 @@ const Header = ({ title, subtitle, className = '', ...props }) => {
             
             {/* Title with subtle animation */}
             <div>
-              <h1 className="text-lg font-semibold text-text-primary transition-colors duration-200">
+              <h1 className="heading-xs text-text-primary transition-colors duration-200">
                 Mis Mentores
               </h1>
             </div>
@@ -273,7 +273,7 @@ const Header = ({ title, subtitle, className = '', ...props }) => {
                     aria-expanded={isDropdownOpen}
                     aria-haspopup="true"
                   >
-                    <h1 className="text-lg font-semibold truncate max-w-32">
+                    <h1 className="heading-xs truncate max-w-32">
                       {displayContent.title}
                     </h1>
                     <ChevronDownIcon 
@@ -298,7 +298,7 @@ const Header = ({ title, subtitle, className = '', ...props }) => {
                       <div className="absolute top-full left-1/2 transform -translate-x-1/2 mt-2 w-72 bg-white border border-gray-200 rounded-xl shadow-xl z-20 animate-in slide-in-from-top-2 duration-200 overflow-hidden">
                         <div className="py-2">
                           {/* Header */}
-                          <div className="px-4 py-3 text-xs font-medium text-text-secondary uppercase tracking-wide border-b border-gray-100 bg-gray-50">
+                          <div className="px-4 py-3 caption text-text-secondary uppercase tracking-wide border-b border-gray-100 bg-gray-50">
                             Cambiar mentor
                           </div>
                           
@@ -309,7 +309,7 @@ const Header = ({ title, subtitle, className = '', ...props }) => {
                                 key={mentor.id}
                                 onClick={() => handleMentorSwitch(mentor.id)}
                                 disabled={isNavigating}
-                                className={`w-full flex items-center px-4 py-3 text-sm transition-all duration-200 hover:bg-primary-50 focus:bg-primary-50 focus:outline-none group ${
+                                className={`w-full flex items-center px-4 py-3 body-sm transition-all duration-200 hover:bg-primary-50 focus:bg-primary-50 focus:outline-none group ${
                                   activeMentorId === mentor.id 
                                     ? 'bg-primary-50 text-primary border-r-4 border-primary' 
                                     : 'text-text-primary hover:text-primary'
@@ -317,10 +317,10 @@ const Header = ({ title, subtitle, className = '', ...props }) => {
                                 style={{ animationDelay: `${index * 50}ms` }}
                               >
                                 <div className="flex-1 text-left">
-                                  <div className="font-medium truncate group-hover:translate-x-1 transition-transform duration-200">
+                                  <div className="label truncate group-hover:translate-x-1 transition-transform duration-200">
                                     {mentor.name}
                                   </div>
-                                  <div className="text-xs text-text-secondary truncate">
+                                  <div className="caption text-text-secondary truncate">
                                     {mentor.subject}
                                   </div>
                                 </div>
@@ -339,7 +339,7 @@ const Header = ({ title, subtitle, className = '', ...props }) => {
                                 closeDropdown();
                               }}
                               disabled={isNavigating}
-                              className="w-full flex items-center px-4 py-3 text-sm text-text-secondary hover:bg-gray-50 hover:text-primary transition-all duration-200 group"
+                              className="w-full flex items-center px-4 py-3 body-sm text-text-secondary hover:bg-gray-50 hover:text-primary transition-all duration-200 group"
                             >
                               <PlusIcon className="mr-3 group-hover:rotate-90 transition-transform duration-300" />
                               <span className="group-hover:translate-x-1 transition-transform duration-200">
@@ -353,7 +353,7 @@ const Header = ({ title, subtitle, className = '', ...props }) => {
                   )}
                 </div>
               ) : (
-                <h1 className="text-lg font-semibold text-text-primary truncate transition-colors duration-200">
+                <h1 className="heading-xs text-text-primary truncate transition-colors duration-200">
                   {displayContent.title}
                 </h1>
               )}
@@ -361,7 +361,7 @@ const Header = ({ title, subtitle, className = '', ...props }) => {
             
             {/* Subtitle with fade animation */}
             {displayContent.subtitle && (
-              <p className="text-sm text-text-secondary truncate text-center mt-0.5 animate-in fade-in duration-300">
+              <p className="body-sm text-text-secondary truncate text-center mt-0.5 animate-in fade-in duration-300">
                 {displayContent.subtitle}
               </p>
             )}

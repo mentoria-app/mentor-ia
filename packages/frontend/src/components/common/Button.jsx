@@ -8,7 +8,7 @@ const Button = ({
   disabled = false,
   ...props 
 }) => {
-  const baseClasses = 'font-medium rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed';
+  const baseClasses = 'button-text rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed';
   
   const variantClasses = {
     primary: 'bg-primary text-white hover:bg-primary-600 focus:ring-primary-500 active:bg-primary-700',
@@ -18,10 +18,10 @@ const Button = ({
   };
 
   const sizeClasses = {
-    sm: 'px-3 py-1.5 text-sm',
-    md: 'px-4 py-2 text-sm',
-    lg: 'px-6 py-3 text-base',
-    xl: 'px-8 py-4 text-lg',
+      sm: 'px-3 py-1.5 body-sm',
+  md: 'px-4 py-2 button-text',
+  lg: 'px-6 py-3 button-text',
+  xl: 'px-8 py-4 body-md',
   };
 
   const classes = `${baseClasses} ${variantClasses[variant]} ${sizeClasses[size]} ${className}`;

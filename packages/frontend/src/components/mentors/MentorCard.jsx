@@ -58,13 +58,13 @@ const MentorCard = ({
         {/* Content Section - Takes available space */}
         <div className="flex-1 mb-3 min-h-0">
           {/* Name */}
-          <h3 className="font-bold text-text-primary text-base leading-tight line-clamp-2 group-hover:text-text-primary/90 transition-colors mb-2">
+          <h3 className="heading-xs line-clamp-2 group-hover:text-text-primary/90 transition-colors mb-2">
             {name || 'Mentor'}
           </h3>
           
           {/* Expertise */}
           {expertise && (
-            <p className="text-sm text-text-secondary leading-normal line-clamp-2 group-hover:text-text-secondary/80 transition-colors">
+            <p className="body-sm text-text-secondary line-clamp-2 group-hover:text-text-secondary/80 transition-colors">
               {expertise}
             </p>
           )}
@@ -80,7 +80,7 @@ const MentorCard = ({
                   d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
               </svg>
             </div>
-            <span className="text-xs font-medium text-text-secondary">
+            <span className="caption">
               {resourceCount} recursos
             </span>
           </div>

@@ -60,7 +60,7 @@ const QuizGenerationModal = ({ isOpen }) => {
       <div className="p-6">
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
-          <h2 className="text-xl font-bold text-text-primary">
+          <h2 className="heading-sm text-text-primary">
             Generar Quiz
           </h2>
           <button
@@ -77,7 +77,7 @@ const QuizGenerationModal = ({ isOpen }) => {
         <form onSubmit={handleSubmit} className="space-y-5">
           {/* Resource Selection */}
           <div>
-            <label htmlFor="resourceId" className="block text-sm font-medium text-text-primary mb-2">
+            <label htmlFor="resourceId" className="block label text-text-primary mb-2">
               Seleccionar Contenido *
             </label>
             <select
@@ -97,7 +97,7 @@ const QuizGenerationModal = ({ isOpen }) => {
               ))}
             </select>
             {availableResources.length === 0 && (
-              <p className="text-sm text-gray-500 mt-1">
+              <p className="body-sm text-gray-500 mt-1">
                 No hay recursos disponibles. Sube contenido primero.
               </p>
             )}
@@ -105,7 +105,7 @@ const QuizGenerationModal = ({ isOpen }) => {
 
           {/* Quiz Length */}
           <div>
-            <label htmlFor="quizLength" className="block text-sm font-medium text-text-primary mb-2">
+            <label htmlFor="quizLength" className="block label text-text-primary mb-2">
               Número de Preguntas
             </label>
             <select
@@ -125,7 +125,7 @@ const QuizGenerationModal = ({ isOpen }) => {
 
           {/* Difficulty Selection */}
           <div>
-            <label className="block text-sm font-medium text-text-primary mb-3">
+            <label className="block label text-text-primary mb-3">
               Nivel de Dificultad
             </label>
             <div className="space-y-3">
@@ -140,8 +140,8 @@ const QuizGenerationModal = ({ isOpen }) => {
                     className="mt-1 text-primary focus:ring-primary"
                   />
                   <div className="flex-1">
-                    <div className="font-medium text-text-primary">{option.label}</div>
-                    <div className="text-sm text-text-secondary">{option.description}</div>
+                    <div className="label text-text-primary">{option.label}</div>
+                    <div className="body-sm text-text-secondary">{option.description}</div>
                   </div>
                 </label>
               ))}

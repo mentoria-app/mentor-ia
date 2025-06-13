@@ -102,15 +102,15 @@ const MentorHub = () => {
                   d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z" />
               </svg>
             </div>
-            <h2 className="text-lg font-bold text-red-900 mb-2">
+            <h2 className="heading-xs text-red-900 mb-2">
               Error al cargar mentores
             </h2>
-            <p className="text-red-700 text-sm mb-6">
+            <p className="body-sm text-red-700 mb-6">
               {error.message || 'Hubo un problema al cargar tus mentores. Intenta nuevamente.'}
             </p>
             <button 
               onClick={() => dispatch(fetchMentors())}
-              className="bg-red-500 hover:bg-red-600 text-white px-6 py-2.5 rounded-xl font-medium
+              className="bg-red-500 hover:bg-red-600 text-white px-6 py-2.5 rounded-xl button-text
                 transition-colors duration-200 shadow-medium hover:shadow-strong"
             >
               Reintentar
@@ -144,10 +144,10 @@ const MentorHub = () => {
                 <div className="absolute -bottom-1 -left-3 w-4 h-4 bg-secondary-400 rounded-full animate-pulse delay-300" />
               </div>
 
-              <h2 className="text-2xl font-bold text-text-primary mb-3">
+              <h2 className="heading-lg text-text-primary mb-3">
                 ¡Crea tu primer Mentor!
               </h2>
-              <p className="text-text-secondary mb-8 leading-relaxed">
+              <p className="body-md text-text-secondary mb-8">
                 Los mentores IA te ayudan a organizar y estudiar cualquier materia. 
                 Cada uno tiene su propia biblioteca de conocimiento.
               </p>
@@ -156,31 +156,31 @@ const MentorHub = () => {
               <div className="grid grid-cols-1 gap-3 text-left">
                 <div className="bg-primary-50 border border-primary-200 rounded-xl p-4 flex items-center space-x-3">
                   <div className="w-8 h-8 bg-primary-500 rounded-lg flex items-center justify-center flex-shrink-0">
-                    <span className="text-white text-sm">1</span>
+                    <span className="body-sm text-white">1</span>
                   </div>
                   <div>
-                    <p className="font-medium text-primary-900 text-sm">Crea un Mentor</p>
-                    <p className="text-primary-700 text-xs">Dale un nombre y personalidad</p>
+                    <p className="label text-primary-900">Crea un Mentor</p>
+                    <p className="caption text-primary-700">Dale un nombre y personalidad</p>
                   </div>
                 </div>
 
                 <div className="bg-secondary-50 border border-secondary-200 rounded-xl p-4 flex items-center space-x-3">
                   <div className="w-8 h-8 bg-secondary-500 rounded-lg flex items-center justify-center flex-shrink-0">
-                    <span className="text-white text-sm">2</span>
+                    <span className="body-sm text-white">2</span>
                   </div>
                   <div>
-                    <p className="font-medium text-secondary-900 text-sm">Sube contenido</p>
-                    <p className="text-secondary-700 text-xs">PDFs, fotos, enlaces de YouTube</p>
+                    <p className="label text-secondary-900">Sube contenido</p>
+                    <p className="caption text-secondary-700">PDFs, fotos, enlaces de YouTube</p>
                   </div>
                 </div>
 
                 <div className="bg-accent-50 border border-accent-200 rounded-xl p-4 flex items-center space-x-3">
                   <div className="w-8 h-8 bg-accent-500 rounded-lg flex items-center justify-center flex-shrink-0">
-                    <span className="text-white text-sm">3</span>
+                    <span className="body-sm text-white">3</span>
                   </div>
                   <div>
-                    <p className="font-medium text-accent-900 text-sm">¡Comienza a estudiar!</p>
-                    <p className="text-accent-700 text-xs">Chat, quizzes y tarjetas</p>
+                    <p className="label text-accent-900">¡Comienza a estudiar!</p>
+                    <p className="caption text-accent-700">Chat, quizzes y tarjetas</p>
                   </div>
                 </div>
               </div>
@@ -203,21 +203,21 @@ const MentorHub = () => {
                 <div className="flex items-start justify-between">
                                      <div className="flex-1 min-w-0">
                      <div className="mb-2">
-                       <h2 className="text-xl font-bold text-text-primary tracking-tight">
+                       <h2 className="heading-sm text-text-primary">
                          Tus Mentores
                        </h2>
                      </div>
                     
                     <div className="flex items-center space-x-2">
-                      <p className="text-sm text-text-secondary leading-relaxed">
+                      <p className="body-sm text-text-secondary">
                         {searchQuery ? (
                           <span className="flex items-center space-x-1">
-                            <span className="font-medium text-primary-600">
+                            <span className="label text-primary-600">
                               {filteredMentors.length}
                             </span>
                             <span>de {mentors.length} mentores</span>
                             <span className="inline-flex items-center px-2 py-0.5 rounded-md bg-gray-100 
-                              text-xs font-medium text-gray-600 max-w-[120px] truncate">
+                              caption text-gray-600 max-w-[120px] truncate">
                               "{searchQuery}"
                             </span>
                           </span>
@@ -236,7 +236,7 @@ const MentorHub = () => {
                         <div className="w-2 h-2 bg-primary-500 rounded-full" />
                         <div className="absolute inset-0 w-2 h-2 bg-primary-400 rounded-full animate-ping" />
                       </div>
-                      <span className="text-xs font-semibold text-primary-700 tracking-wide">
+                      <span className="caption text-primary-700 tracking-wide font-semibold">
                         Filtrado activo
                       </span>
                     </div>
@@ -275,7 +275,7 @@ const MentorHub = () => {
                        value={searchQuery}
                        onChange={(e) => setSearchQuery(e.target.value)}
                        className="flex-1 bg-transparent border-none outline-none text-text-primary 
-                         placeholder-gray-400 text-sm font-medium leading-relaxed
+                         placeholder-gray-400 body-sm
                          focus:placeholder-gray-300 transition-all duration-300
                          selection:bg-primary-100 selection:text-primary-900"
                        autoComplete="off"
@@ -326,17 +326,17 @@ const MentorHub = () => {
                         d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                     </svg>
                   </div>
-                  <h3 className="text-lg font-bold text-text-primary mb-2">
+                  <h3 className="heading-xs text-text-primary mb-2">
                     No encontramos mentores
                   </h3>
-                  <p className="text-text-secondary text-sm mb-6">
-                    No hay mentores que coincidan con "<span className="font-medium text-primary-600">{searchQuery}</span>".
+                  <p className="body-sm text-text-secondary mb-6">
+                    No hay mentores que coincidan con "<span className="label text-primary-600">{searchQuery}</span>".
                     Intenta con otros términos de búsqueda.
                   </p>
                   <button
                     onClick={clearSearch}
                     className="bg-primary-500 hover:bg-primary-600 text-white px-6 py-2.5 rounded-xl 
-                      font-medium transition-colors duration-200 shadow-medium hover:shadow-strong"
+                      button-text transition-colors duration-200 shadow-medium hover:shadow-strong"
                   >
                     Limpiar búsqueda
                   </button>

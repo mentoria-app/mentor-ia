@@ -93,7 +93,7 @@ const Onboarding = () => {
 
         {/* Footer */}
         <div className="text-center mt-3">
-          <p className="text-xs text-gray-500">Paso {currentStep} de {TOTAL_STEPS}</p>
+                        <p className="caption">Paso {currentStep} de {TOTAL_STEPS}</p>
         </div>
       </div>
     </div>

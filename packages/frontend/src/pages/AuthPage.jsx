@@ -54,10 +54,10 @@ const AuthPage = () => {
       <div className="w-full max-w-md space-y-8">
         {/* Header */}
         <div className="text-center">
-          <h1 className="text-3xl font-bold text-text-primary mb-2">
+          <h1 className="heading-lg text-text-primary mb-2">
             MentorIA
           </h1>
-          <p className="text-text-secondary">
+          <p className="body-md text-text-secondary">
             Tu compañero de estudio inteligente
           </p>
         </div>
@@ -66,7 +66,7 @@ const AuthPage = () => {
         <div className="bg-surface rounded-lg p-1 flex">
           <button
             onClick={() => setIsLogin(true)}
-            className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-all duration-200 ${
+            className={`flex-1 py-2 px-4 rounded-md button-text transition-all duration-200 ${
               isLogin
                 ? 'bg-primary text-white shadow-sm'
                 : 'text-text-secondary hover:text-text-primary'
@@ -76,7 +76,7 @@ const AuthPage = () => {
           </button>
           <button
             onClick={() => setIsLogin(false)}
-            className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-all duration-200 ${
+            className={`flex-1 py-2 px-4 rounded-md button-text transition-all duration-200 ${
               !isLogin
                 ? 'bg-primary text-white shadow-sm'
                 : 'text-text-secondary hover:text-text-primary'
@@ -90,8 +90,8 @@ const AuthPage = () => {
         <div className="bg-surface rounded-lg shadow-sm border border-gray-200 p-6">
           {registrationSuccess ? (
             <div className="text-center space-y-4">
-              <h3 className="text-xl font-bold text-green-600">¡Registro Exitoso!</h3>
-              <p className="text-text-secondary">
+              <h3 className="heading-sm text-green-600">¡Registro Exitoso!</h3>
+              <p className="body-md text-text-secondary">
                 Hemos creado tu cuenta. Por favor, inicia sesión para continuar.
               </p>
               <Button onClick={() => {
@@ -133,7 +133,7 @@ const AuthPage = () => {
                 required
               />
 
-              {error && <p className="text-red-500 text-sm text-center">{error.detail || 'An error occurred'}</p>}
+              {error && <p className="body-sm text-red-500 text-center">{error.detail || 'An error occurred'}</p>}
 
               <Button
                 type="submit"
@@ -154,12 +154,12 @@ const AuthPage = () => {
 
           {!registrationSuccess && (
             <div className="mt-6 text-center">
-              <p className="text-text-secondary text-sm">
+              <p className="body-sm text-text-secondary">
                 {isLogin ? '¿No tienes cuenta?' : '¿Ya tienes cuenta?'}
               </p>
               <button
                 onClick={toggleAuthMode}
-                className="text-primary font-medium text-sm hover:text-primary-600 transition-colors duration-200 mt-1"
+                className="text-primary label hover:text-primary-600 transition-colors duration-200 mt-1"
               >
                 {isLogin ? 'Regístrate aquí' : 'Inicia sesión aquí'}
               </button>
@@ -168,7 +168,7 @@ const AuthPage = () => {
         </div>
 
         {/* Footer */}
-        <div className="text-center text-text-secondary text-xs">
+        <div className="text-center text-text-secondary caption">
           <p>Al continuar, aceptas nuestros términos de servicio y política de privacidad</p>
         </div>
       </div>

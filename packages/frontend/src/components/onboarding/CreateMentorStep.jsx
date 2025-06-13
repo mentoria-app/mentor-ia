@@ -34,8 +34,8 @@ const CreateMentorStep = ({
             <Sparkles className="w-6 h-6 text-white" />
           </div>
         </div>
-        <h2 className="text-xl font-bold text-center">Crea tu Primer Mentor</h2>
-        <p className="text-emerald-100 text-center text-xs mt-1">Personaliza tu compañero de aprendizaje</p>
+        <h2 className="heading-sm text-center">Crea tu Primer Mentor</h2>
+        <p className="caption text-emerald-100 text-center mt-1">Personaliza tu compañero de aprendizaje</p>
       </div>
 
       <div className="p-4 bg-white min-h-[340px]">
@@ -46,12 +46,12 @@ const CreateMentorStep = ({
               placeholder="ej. Ayudante de Matemáticas, Amigo de Biología..."
               value={mentorName}
               onChange={(e) => handleNameChange(e.target.value)}
-              className="text-lg border-2 border-gray-200 focus:border-emerald-500 focus:ring-emerald-200"
+              className="heading-xs border-2 border-gray-200 focus:border-emerald-500 focus:ring-emerald-200"
               maxLength={maxLength}
               required
             />
             {mentorName && (
-              <p className="text-xs text-emerald-600 mt-2 flex items-center">
+              <p className="caption text-emerald-600 mt-2 flex items-center">
                 <CheckCircle2 className="w-3 h-3 mr-1" /> ¡Excelente elección de nombre!
               </p>
             )}

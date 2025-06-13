@@ -53,7 +53,7 @@ const FlashcardGenerationModal = ({ isOpen }) => {
       <div className="p-6">
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
-          <h2 className="text-xl font-bold text-text-primary">
+          <h2 className="heading-sm text-text-primary">
             Generar Tarjetas de Estudio
           </h2>
           <button
@@ -70,7 +70,7 @@ const FlashcardGenerationModal = ({ isOpen }) => {
         <form onSubmit={handleSubmit} className="space-y-5">
           {/* Resource Selection */}
           <div>
-            <label htmlFor="resourceId" className="block text-sm font-medium text-text-primary mb-2">
+            <label htmlFor="resourceId" className="block label text-text-primary mb-2">
               Seleccionar Contenido *
             </label>
             <select
@@ -90,7 +90,7 @@ const FlashcardGenerationModal = ({ isOpen }) => {
               ))}
             </select>
             {availableResources.length === 0 && (
-              <p className="text-sm text-gray-500 mt-1">
+              <p className="body-sm text-gray-500 mt-1">
                 No hay recursos disponibles. Sube contenido primero.
               </p>
             )}
@@ -98,7 +98,7 @@ const FlashcardGenerationModal = ({ isOpen }) => {
 
           {/* Number of Cards */}
           <div>
-            <label htmlFor="cardCount" className="block text-sm font-medium text-text-primary mb-2">
+            <label htmlFor="cardCount" className="block label text-text-primary mb-2">
               Número de Tarjetas
             </label>
             <select
@@ -125,8 +125,8 @@ const FlashcardGenerationModal = ({ isOpen }) => {
                 </svg>
               </div>
               <div className="flex-1">
-                <h4 className="text-sm font-medium text-blue-800">Sobre las tarjetas de estudio</h4>
-                <p className="text-sm text-blue-700 mt-1">
+                <h4 className="label text-blue-800">Sobre las tarjetas de estudio</h4>
+                <p className="body-sm text-blue-700 mt-1">
                   Las tarjetas incluirán conceptos clave, definiciones y preguntas basadas en tu contenido. 
                   Perfectas para repasar antes de exámenes.
                 </p>

@@ -51,10 +51,10 @@ const MentorDashboard = ({ activeTab = 'resources' }) => {
     return (
       <div className="flex flex-col items-center justify-center min-h-full p-6">
         <div className="text-center">
-          <h2 className="text-2xl font-semibold text-gray-900 mb-2">
+          <h2 className="heading-md text-gray-900 mb-2">
             Mentor no encontrado
           </h2>
-          <p className="text-gray-600">
+          <p className="body-md text-gray-600">
             El mentor que estás buscando no existe o ha sido eliminado.
           </p>
         </div>
@@ -125,8 +125,8 @@ const MentorDashboard = ({ activeTab = 'resources' }) => {
         return (
           <div className="h-full overflow-y-auto p-4">
             <Card className="p-6 text-center">
-              <h3 className="text-lg font-semibold mb-2">Quiz de Práctica</h3>
-              <p className="text-gray-600 mb-4">
+              <h3 className="heading-xs mb-2">Quiz de Práctica</h3>
+              <p className="body-sm text-gray-600 mb-4">
                 Pon a prueba tus conocimientos con preguntas personalizadas
               </p>
               <Button 
@@ -143,8 +143,8 @@ const MentorDashboard = ({ activeTab = 'resources' }) => {
         return (
           <div className="h-full overflow-y-auto p-4">
             <Card className="p-6 text-center">
-              <h3 className="text-lg font-semibold mb-2">Tarjetas de Estudio</h3>
-              <p className="text-gray-600 mb-4">
+              <h3 className="heading-xs mb-2">Tarjetas de Estudio</h3>
+              <p className="body-sm text-gray-600 mb-4">
                 Repasa conceptos clave con tarjetas interactivas
               </p>
               <Button 
@@ -164,10 +164,10 @@ const MentorDashboard = ({ activeTab = 'resources' }) => {
             <div className="space-y-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <h2 className="text-xl font-semibold text-gray-900">
+                  <h2 className="heading-sm text-gray-900">
                     Tus Recursos
                   </h2>
-                  <p className="text-sm text-gray-600">
+                  <p className="caption">
                     {resources.length} {resources.length === 1 ? 'recurso subido' : 'recursos subidos'}
                   </p>
                 </div>
@@ -175,7 +175,7 @@ const MentorDashboard = ({ activeTab = 'resources' }) => {
                 <Button
                   onClick={handleUploadResource}
                   disabled={isUploading}
-                  className="bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 disabled:cursor-not-allowed text-white px-4 py-2 rounded-lg font-medium flex items-center space-x-2"
+                  className="bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 disabled:cursor-not-allowed text-white px-4 py-2 rounded-lg button-text flex items-center space-x-2"
                 >
                   {isUploading ? (
                     <>
@@ -225,12 +225,12 @@ const MentorDashboard = ({ activeTab = 'resources' }) => {
                 ) : (
                   <Card className="p-8 text-center border-2 border-dashed border-gray-300">
                     <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                      <span className="text-2xl">📚</span>
+                      <span className="heading-sm">📚</span>
                     </div>
-                    <h3 className="text-lg font-medium text-gray-900 mb-2">
+                    <h3 className="heading-xs text-gray-900 mb-2">
                       No hay recursos aún
                     </h3>
-                    <p className="text-gray-600 mb-4">
+                    <p className="body-sm text-gray-600 mb-4">
                       Sube tu primer recurso para que tu mentor pueda ayudarte mejor
                     </p>
                     <Button
@@ -274,21 +274,21 @@ const MentorDashboard = ({ activeTab = 'resources' }) => {
             </div>
 
             <div className="flex-1 min-w-0">
-              <h1 className="text-2xl font-bold truncate">
+              <h1 className="heading-lg truncate">
                 {mentor.name}
               </h1>
-              <p className="text-blue-100 mt-1 truncate">
+              <p className="body-md text-blue-100 mt-1 truncate">
                 {mentor.expertise}
               </p>
-              <p className="text-blue-200 text-sm mt-2 truncate">
+              <p className="body-sm text-blue-200 mt-2 truncate">
                 {mentor.description}
               </p>
             </div>
 
             <div className="hidden sm:flex flex-col items-end space-y-1">
               <div className="text-right">
-                <p className="text-2xl font-bold">{resources.length}</p>
-                <p className="text-blue-200 text-sm">
+                <p className="heading-md">{resources.length}</p>
+                <p className="caption text-blue-200">
                   {resources.length === 1 ? 'Recurso' : 'Recursos'}
                 </p>
               </div>

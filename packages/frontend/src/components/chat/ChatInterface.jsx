@@ -106,22 +106,22 @@ const ChatInterface = ({ className = '' }) => {
                     : 'bg-white border border-gray-100 text-text-primary rounded-3xl rounded-bl-lg shadow-sm'
                 }`}
               >
-                <p className="text-sm leading-relaxed whitespace-pre-wrap">
-                  {message.content}
-                </p>
+                              <p className="body-sm leading-relaxed whitespace-pre-wrap">
+                {message.content}
+              </p>
                 
                 {message.type === 'mentor' && message.citation && (
                   <div className="mt-3 pt-3 border-t border-gray-100">
                     <div className="flex items-start space-x-2">
-                      <span className="text-gray-400 text-xs mt-0.5">📄</span>
-                      <p className="text-xs text-text-secondary italic leading-relaxed">
+                      <span className="text-gray-400 caption mt-0.5">📄</span>
+                      <p className="caption text-text-secondary italic leading-relaxed">
                         {message.citation}
                       </p>
                     </div>
                   </div>
                 )}
                 
-                <div className={`text-xs mt-2 ${
+                <div className={`caption mt-2 ${
                   message.type === 'user' ? 'text-white/70 text-right' : 'text-text-secondary'
                 }`}>
                   {formatTimestamp(message.timestamp)}

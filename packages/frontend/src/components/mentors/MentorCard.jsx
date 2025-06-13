@@ -20,7 +20,7 @@ const MentorCard = ({
   return (
     <Card 
       className={`group relative overflow-hidden transition-all duration-300 ease-out cursor-pointer
-        bg-white border-2 border-gray-200 h-52
+        bg-white border-2 border-gray-200 h-60
         hover:shadow-medium hover:-translate-y-1
         active:scale-[0.98] active:duration-75
         ${className}`}
@@ -56,17 +56,19 @@ const MentorCard = ({
         </div>
 
         {/* Content Section - Takes available space */}
-        <div className="flex-1 mb-3 min-h-0">
+        <div className="flex-1 mb-4 min-h-0 overflow-hidden">
           {/* Name */}
-          <h3 className="heading-xs line-clamp-2 group-hover:text-text-primary/90 transition-colors mb-2">
+          <h3 className="heading-xs line-clamp-2 group-hover:text-text-primary/90 transition-colors mb-3">
             {name || 'Mentor'}
           </h3>
           
           {/* Expertise */}
           {expertise && (
-            <p className="body-sm text-text-secondary line-clamp-2 group-hover:text-text-secondary/80 transition-colors">
-              {expertise}
-            </p>
+            <div className="overflow-hidden">
+              <p className="body-sm text-text-secondary line-clamp-3 group-hover:text-text-secondary/80 transition-colors leading-relaxed">
+                {expertise}
+              </p>
+            </div>
           )}
         </div>
 

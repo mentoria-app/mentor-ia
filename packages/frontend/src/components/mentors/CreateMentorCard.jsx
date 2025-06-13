@@ -5,7 +5,7 @@ const CreateMentorCard = ({ onClick, className = '', ...props }) => {
   return (
     <Card 
       className={`group relative overflow-hidden transition-all duration-300 ease-out cursor-pointer
-        bg-white border-2 border-gray-200 h-52
+        bg-white border-2 border-gray-200 h-60
         hover:shadow-medium hover:-translate-y-1 hover:border-primary-300
         active:scale-[0.98] active:duration-75
         ${className}`}

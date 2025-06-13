@@ -199,19 +199,14 @@ const Header = ({ title, subtitle, className = '', ...props }) => {
         {...props}
       >
         <div className="flex items-center justify-between">
-          {/* Left section - Logo and Title */}
-          <div className="flex items-center space-x-3">
-            {/* Animated Logo */}
-            <div className="w-8 h-8 bg-gradient-to-br from-primary-500 to-primary-600 rounded-xl flex items-center justify-center shadow-soft hover:shadow-md transition-all duration-300 hover:scale-110 cursor-pointer">
-              <MentorIcon className="transition-transform duration-300 hover:rotate-12" />
-            </div>
-            
-            {/* Title with subtle animation */}
-            <div>
-              <h1 className="heading-xs text-text-primary transition-colors duration-200">
-                Mis Mentores
-              </h1>
-            </div>
+          {/* Left section - Empty for spacing */}
+          <div className="w-10"></div>
+
+          {/* Center section - Title */}
+          <div className="flex-1 flex justify-center">
+            <h1 className="heading-xs text-text-primary transition-colors duration-200">
+              Mis Mentores
+            </h1>
           </div>
 
           {/* Right section - Profile */}

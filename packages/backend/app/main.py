@@ -1,7 +1,16 @@
+import sentry_sdk
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.core.config import settings
 from app.api.v1.api import api_router
+
+# Initialize Sentry
+# Make sure to do this before you initialize your FastAPI app
+sentry_sdk.init(
+    dsn=settings.sentry_dsn,
+    # Enable performance monitoring
+    traces_sample_rate=1.0,
+)
 
 # Create FastAPI instance
 app = FastAPI(

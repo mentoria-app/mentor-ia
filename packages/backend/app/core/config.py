@@ -24,6 +24,9 @@ class Settings(BaseSettings):
     openai_api_key: Optional[str] = None
     groq_api_key: Optional[str] = None
     
+    # Monitoring settings
+    sentry_dsn: Optional[str] = None
+    
     # CORS settings
     cors_origins: list[str] = ["http://localhost:3000", "http://localhost:5173"]
     

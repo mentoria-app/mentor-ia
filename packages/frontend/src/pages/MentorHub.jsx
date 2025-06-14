@@ -11,7 +11,7 @@ import {
   openMentorCreationModal, 
   selectIsMentorCreationModalOpen 
 } from '../state';
-import { selectIsAuthenticated } from '../state';
+import { selectIsAuthenticated, selectUser } from '../state';
 
 const MentorHub = () => {
   const navigate = useNavigate();
@@ -25,6 +25,7 @@ const MentorHub = () => {
   const loading = useSelector(selectMentorsLoading);
   const error = useSelector(selectMentorsError);
   const isAuthenticated = useSelector(selectIsAuthenticated);
+  const user = useSelector(selectUser);
   const isMentorCreationModalOpen = useSelector(selectIsMentorCreationModalOpen);
 
   // Filter mentors based on search query
@@ -204,7 +205,7 @@ const MentorHub = () => {
                                      <div className="flex-1 min-w-0">
                      <div className="mb-2">
                        <h2 className="heading-sm text-text-primary">
-                         Tus Mentores
+                         {user?.full_name ? `Bienvenido, ${user.full_name}` : 'Bienvenido'}
                        </h2>
                      </div>
                     

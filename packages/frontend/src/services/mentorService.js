@@ -223,30 +223,54 @@ export const createMentor = async (mentorData) => {
   }
 };
 
-// Update an existing mentor
+// Update an existing mentor - REAL API CALL
 export const updateMentor = async (mentorId, updates) => {
-  return new Promise((resolve, reject) => {
-    setTimeout(() => {
-      const mentorIndex = mockMentors.findIndex(m => m.id === parseInt(mentorId));
-      
-      if (mentorIndex === -1) {
-        reject({
+  try {
+    const response = await api.put(`/mentors/${mentorId}`, {
+      name: updates.name,
+      expertise: updates.expertise,
+      description: updates.description,
+      avatar_url: updates.avatar_url
+    });
+    
+    return response.data;
+  } catch (error) {
+    console.error('Error updating mentor:', error);
+    
+    // Enhanced error handling
+    if (error.response) {
+      // Server responded with an error status
+      if (error.response.status === 404) {
+        throw {
           error: 'MENTOR_NOT_FOUND',
           message: 'Mentor no encontrado'
-        });
-        return;
+        };
       }
-
-      // Update mentor
-      mockMentors[mentorIndex] = {
-        ...mockMentors[mentorIndex],
-        ...updates,
-        updatedAt: new Date().toISOString()
+      if (error.response.status === 400) {
+        throw {
+          error: 'VALIDATION_ERROR',
+          message: error.response.data.detail || 'Datos de mentor inválidos'
+        };
+      }
+      throw {
+        error: 'API_ERROR',
+        message: error.response.data.detail || 'Error del servidor',
+        status: error.response.status
       };
-
-      resolve(mockMentors[mentorIndex]);
-    }, API_DELAY);
-  });
+    } else if (error.request) {
+      // Network error
+      throw {
+        error: 'NETWORK_ERROR',
+        message: 'Error de conexión. Intenta nuevamente.'
+      };
+    } else {
+      // Other error
+      throw {
+        error: 'UPDATE_ERROR',
+        message: 'Error al actualizar el mentor'
+      };
+    }
+  }
 };
 
 // Delete a mentor

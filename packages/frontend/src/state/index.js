@@ -6,6 +6,7 @@ export {
   setMentors,
   addMentor,
   updateMentor,
+  updateMentorAsync,
   deleteMentor,
   setActiveMentor,
   addResourceToMentor,

@@ -24,4 +24,14 @@ export const DEFAULT_AVATAR = '/assets/avatars/default.webp';
 export const getAvatarUrl = (avatarId) => {
   const avatar = AVATAR_OPTIONS.find(option => option.id === avatarId);
   return avatar ? avatar.image : DEFAULT_AVATAR;
+};
+
+/**
+ * Get avatar ID from URL
+ * @param {string} avatarUrl - The avatar URL
+ * @returns {string} The avatar ID
+ */
+export const getAvatarIdFromUrl = (avatarUrl) => {
+  const avatar = AVATAR_OPTIONS.find(option => option.image === avatarUrl);
+  return avatar ? avatar.id : 'default';
 }; 

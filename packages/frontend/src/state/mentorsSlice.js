@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import { getMentors, createMentor as createMentorAPI } from '../services/mentorService';
+import { getMentors, createMentor as createMentorAPI, updateMentor as updateMentorAPI } from '../services/mentorService';
 import { getResources, uploadResource as uploadResourceAPI } from '../services/resourceService';
 import { logoutUser } from './authSlice';
 
@@ -29,6 +29,19 @@ export const createMentor = createAsyncThunk(
     try {
       const newMentor = await createMentorAPI(mentorData);
       return newMentor;
+    } catch (error) {
+      return rejectWithValue(error);
+    }
+  }
+);
+
+// Async Thunk for updating a mentor
+export const updateMentorAsync = createAsyncThunk(
+  'mentors/updateMentorAsync',
+  async ({ id, updates }, { rejectWithValue }) => {
+    try {
+      const updatedMentor = await updateMentorAPI(id, updates);
+      return { id, updates: updatedMentor };
     } catch (error) {
       return rejectWithValue(error);
     }
@@ -249,6 +262,27 @@ const mentorsSlice = createSlice({
         state.error = action.payload || {
           error: 'CREATE_ERROR',
           message: 'Error al crear el mentor'
+        };
+      })
+      // Handle updateMentorAsync async thunk
+      .addCase(updateMentorAsync.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(updateMentorAsync.fulfilled, (state, action) => {
+        state.loading = false;
+        const { id, updates } = action.payload;
+        const mentorIndex = state.mentors.findIndex(mentor => compareIds(mentor.id, id));
+        if (mentorIndex !== -1) {
+          state.mentors[mentorIndex] = { ...state.mentors[mentorIndex], ...updates };
+        }
+        state.error = null;
+      })
+      .addCase(updateMentorAsync.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload || {
+          error: 'UPDATE_ERROR',
+          message: 'Error al actualizar el mentor'
         };
       })
       // Handle fetchResourcesForMentor async thunk

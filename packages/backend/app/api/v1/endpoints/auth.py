@@ -103,12 +103,13 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends()):
                 headers={"WWW-Authenticate": "Bearer"}
             )
         
-        # Create JWT access token with user data
+        # Create JWT access token with user data including full_name
         access_token = create_access_token(
             data={
                 "sub": response.user.email,  # Subject (user identifier)
                 "user_id": response.user.id,  # Include user ID for easy access
-                "email": response.user.email
+                "email": response.user.email,
+                "full_name": response.user.user_metadata.get("full_name") if response.user.user_metadata else None
             }
         )
         

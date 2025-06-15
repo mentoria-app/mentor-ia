@@ -4,6 +4,7 @@ from jose import jwt, JWTError
 from passlib.context import CryptContext
 from fastapi import Depends, HTTPException, status
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
+import logging
 
 from app.core.config import settings
 from app.db.client import supabase
@@ -12,6 +13,9 @@ from app.schemas.token import TokenData
 
 # Password hashing context
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+
+# Logger for debugging
+logger = logging.getLogger(__name__)
 
 def verify_password(plain_password: str, hashed_password: str) -> bool:
     """
@@ -103,51 +107,19 @@ async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(s
     # Extract user information from JWT payload
     user_id: str = payload.get("user_id")
     user_email: str = payload.get("email")
+    full_name: str = payload.get("full_name")
     
     if user_id is None or user_email is None:
         raise credentials_exception
     
-    try:
-        # Fetch the user data from Supabase
-        response = supabase().auth.get_user(credentials.credentials)
-        
-        if response.user is None:
-            raise credentials_exception
-        
-        # Helper function to safely parse Supabase datetime strings
-        def parse_supabase_datetime(date_str):
-            if not date_str:
-                return None
-            try:
-                # Handle both 'Z' and '+00:00' timezone formats
-                if date_str.endswith('Z'):
-                    date_str = date_str.replace('Z', '+00:00')
-                return datetime.fromisoformat(date_str)
-            except (ValueError, AttributeError):
-                # Fallback to current time if parsing fails
-                return datetime.utcnow()
-        
-        # Create User object from Supabase response
-        user = User(
-            id=str(response.user.id),  # Ensure it's a string
-            email=response.user.email,
-            full_name=response.user.user_metadata.get("full_name") if response.user.user_metadata else None,
-            is_active=True,
-            created_at=parse_supabase_datetime(response.user.created_at),
-            updated_at=parse_supabase_datetime(response.user.updated_at)
-        )
-        
-        return user
-        
-    except Exception as e:
-        # If Supabase call fails, fall back to creating user from JWT data
-        user = User(
-            id=str(user_id),  # Ensure it's a string
-            email=user_email,
-            full_name=None,
-            is_active=True,
-            created_at=datetime.utcnow(),
-            updated_at=None
-        )
-        
-        return user
+    # Create User object from JWT payload data
+    user = User(
+        id=str(user_id),  # Ensure it's a string
+        email=user_email,
+        full_name=full_name,
+        is_active=True,
+        created_at=datetime.utcnow(),  # We don't have exact creation time in JWT
+        updated_at=None
+    )
+    
+    return user

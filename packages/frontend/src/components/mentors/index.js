@@ -1,3 +1,9 @@
 export { default as MentorCard } from './MentorCard';
 export { default as CreateMentorCard } from './CreateMentorCard';
-export { default as MentorCreationModal } from './MentorCreationModal'; 
+export { default as MentorCreationModal } from './MentorCreationModal';
+export { default as MentorDashboardHeader } from './MentorDashboardHeader';
+export { default as ResourcesTab } from './ResourcesTab';
+export { default as ChatTab } from './ChatTab';
+export { default as QuizTab } from './QuizTab';
+export { default as FlashcardsTab } from './FlashcardsTab';
+export { default as SettingsTab } from './SettingsTab'; 

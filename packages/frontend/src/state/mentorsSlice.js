@@ -1,6 +1,7 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { getMentors, createMentor as createMentorAPI } from '../services/mentorService';
 import { getResources, uploadResource as uploadResourceAPI } from '../services/resourceService';
+import { logoutUser } from './authSlice';
 
 // Helper function for consistent ID comparison
 const compareIds = (id1, id2) => {
@@ -291,6 +292,10 @@ const mentorsSlice = createSlice({
           error: 'UPLOAD_RESOURCE_ERROR',
           message: 'Error al subir el recurso'
         };
+      })
+      // Handle logout to clear mentor state
+      .addCase(logoutUser.fulfilled, (state) => {
+        return initialState; // Reset to initial state on logout
       });
   }
 });

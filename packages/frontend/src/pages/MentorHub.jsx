@@ -11,7 +11,7 @@ import {
   openMentorCreationModal, 
   selectIsMentorCreationModalOpen 
 } from '../state';
-import { selectIsAuthenticated, selectUser } from '../state';
+import { selectIsAuthenticated, selectUser, selectAuthLoading } from '../state';
 
 const MentorHub = () => {
   const navigate = useNavigate();
@@ -26,6 +26,7 @@ const MentorHub = () => {
   const error = useSelector(selectMentorsError);
   const isAuthenticated = useSelector(selectIsAuthenticated);
   const user = useSelector(selectUser);
+  const authLoading = useSelector(selectAuthLoading);
   const isMentorCreationModalOpen = useSelector(selectIsMentorCreationModalOpen);
 
 
@@ -43,10 +44,10 @@ const MentorHub = () => {
 
   // Fetch mentors on component mount if user is authenticated
   useEffect(() => {
-    if (isAuthenticated) {
+    if (isAuthenticated && user && !authLoading) {
       dispatch(fetchMentors());
     }
-  }, [dispatch, isAuthenticated]);
+  }, [dispatch, isAuthenticated, !!user, authLoading]);
 
   const handleMentorClick = (mentor) => {
     navigate(`/mentor/${mentor.id}`);
@@ -109,15 +110,20 @@ const MentorHub = () => {
               Error al cargar mentores
             </h2>
             <p className="body-sm text-red-700 mb-6">
-              {error.message || 'Hubo un problema al cargar tus mentores. Intenta nuevamente.'}
+              {error.error === 'AUTH_ERROR' 
+                ? 'Sesión expirada. Serás redirigido al login...'
+                : error.message || 'Hubo un problema al cargar tus mentores. Intenta nuevamente.'
+              }
             </p>
-            <button 
-              onClick={() => dispatch(fetchMentors())}
-              className="bg-red-500 hover:bg-red-600 text-white px-6 py-2.5 rounded-xl button-text
-                transition-colors duration-200 shadow-medium hover:shadow-strong"
-            >
-              Reintentar
-            </button>
+            {error.error !== 'AUTH_ERROR' && (
+              <button 
+                onClick={() => dispatch(fetchMentors())}
+                className="bg-red-500 hover:bg-red-600 text-white px-6 py-2.5 rounded-xl button-text
+                  transition-colors duration-200 shadow-medium hover:shadow-strong"
+              >
+                Reintentar
+              </button>
+            )}
           </div>
         </div>
       </div>

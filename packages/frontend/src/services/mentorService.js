@@ -125,6 +125,17 @@ export const getMentors = async () => {
     // Enhanced error handling
     if (error.response) {
       // Server responded with an error status
+      if (error.response.status === 401) {
+        // Clear invalid token
+        localStorage.removeItem('authToken');
+        // Dispatch custom event for auth error handling
+        window.dispatchEvent(new CustomEvent('auth:expired'));
+        throw {
+          error: 'AUTH_ERROR',
+          message: 'Session expired. Please log in again.',
+          status: 401
+        };
+      }
       throw {
         error: 'API_ERROR',
         message: error.response.data.detail || 'Error del servidor',
@@ -136,6 +147,9 @@ export const getMentors = async () => {
         error: 'NETWORK_ERROR',
         message: 'Error de conexión. Intenta nuevamente.'
       };
+    } else if (error.error) {
+      // Pre-thrown error (like AUTH_ERROR above)
+      throw error;
     } else {
       // Other error
       throw {

@@ -3,7 +3,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AppLayout, ProtectedRoute } from './components/layout';
 import { AuthPage, Onboarding, MentorHub, MentorDashboard, Profile } from './pages';
-import { selectIsAuthenticated, initializeAuth } from './state/authSlice';
+import { selectIsAuthenticated, initializeAuth, logoutUser } from './state/authSlice';
 
 function App() {
   const [activeTab, setActiveTab] = useState('resources');
@@ -13,6 +13,14 @@ function App() {
   // Initialize auth state on app startup
   useEffect(() => {
     dispatch(initializeAuth());
+    
+    // Listen for auth expiration events
+    const handleAuthExpired = () => {
+      dispatch(logoutUser());
+    };
+    
+    window.addEventListener('auth:expired', handleAuthExpired);
+    return () => window.removeEventListener('auth:expired', handleAuthExpired);
   }, [dispatch]);
 
   // Component to handle default route based on auth status

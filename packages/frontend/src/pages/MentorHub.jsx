@@ -207,7 +207,7 @@ const MentorHub = () => {
                                      <div className="flex-1 min-w-0">
                      <div className="mb-2">
                        <h2 className="heading-sm text-text-primary">
-                         {user?.full_name ? `Bienvenido, ${user.full_name}` : 'Bienvenido'}
+                         {user?.full_name ? `Bienvenido, ${user.full_name.split(' ')[0]}` : 'Bienvenido'}
                        </h2>
                      </div>
                     

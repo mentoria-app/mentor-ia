@@ -9,7 +9,7 @@ export const loginUser = createAsyncThunk(
       const data = await authService.login(credentials);
       return data;
     } catch (error) {
-      return rejectWithValue(error.response.data);
+      return rejectWithValue(error.response?.data || { detail: error.message || 'Login failed' });
     }
   }
 );
@@ -22,7 +22,7 @@ export const registerUser = createAsyncThunk(
       const data = await authService.register(userData);
       return data;
     } catch (error) {
-      return rejectWithValue(error.response.data);
+      return rejectWithValue(error.response?.data || { detail: error.message || 'Registration failed' });
     }
   }
 );
@@ -33,6 +33,33 @@ export const logoutUser = createAsyncThunk(
     async () => {
         authService.logout();
     }
+);
+
+// Async thunk for initializing auth state from stored token
+export const initializeAuth = createAsyncThunk(
+  'auth/initializeAuth',
+  async (_, { rejectWithValue }) => {
+    try {
+      const token = localStorage.getItem('authToken');
+      if (!token) {
+        return null;
+      }
+      
+      // Add timeout to prevent hanging initialization
+      const timeoutPromise = new Promise((_, reject) => 
+        setTimeout(() => reject(new Error('Auth initialization timeout')), 10000)
+      );
+      
+      const profilePromise = authService.getProfile();
+      const user = await Promise.race([profilePromise, timeoutPromise]);
+      
+      return { token, user };
+    } catch (error) {
+      // Token is invalid or request failed, remove it
+      localStorage.removeItem('authToken');
+      return rejectWithValue(error.response?.data || { detail: 'Authentication failed' });
+    }
+  }
 );
 
 const initialState = {
@@ -83,13 +110,19 @@ const authSlice = createSlice({
         state.error = null;
         state.registrationSuccess = false;
       })
-      .addCase(registerUser.fulfilled, (state) => {
+      .addCase(registerUser.fulfilled, (state, action) => {
         state.loading = false;
         state.registrationSuccess = true;
+        // After successful registration, user is automatically logged in
+        state.isAuthenticated = true;
+        state.user = action.payload.user;
+        state.token = action.payload.token;
+        state.error = null;
       })
       .addCase(registerUser.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
+        state.registrationSuccess = false;
       })
         // Logout
       .addCase(logoutUser.fulfilled, (state) => {
@@ -98,6 +131,26 @@ const authSlice = createSlice({
           state.token = null;
           state.error = null;
           state.loading = false;
+      })
+      // Initialize auth
+      .addCase(initializeAuth.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(initializeAuth.fulfilled, (state, action) => {
+        state.loading = false;
+        if (action.payload) {
+          state.isAuthenticated = true;
+          state.user = action.payload.user;
+          state.token = action.payload.token;
+        }
+        state.error = null;
+      })
+      .addCase(initializeAuth.rejected, (state) => {
+        state.loading = false;
+        state.isAuthenticated = false;
+        state.user = null;
+        state.token = null;
+        state.error = null;
       });
   }
 });

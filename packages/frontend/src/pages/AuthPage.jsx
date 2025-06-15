@@ -88,20 +88,15 @@ const AuthPage = () => {
 
         {/* Auth Form */}
         <div className="bg-surface rounded-lg shadow-sm border border-gray-200 p-6">
-          {registrationSuccess ? (
+          {registrationSuccess && !isAuthenticated ? (
             <div className="text-center space-y-4">
               <h3 className="heading-sm text-green-600">¡Registro Exitoso!</h3>
               <p className="body-md text-text-secondary">
-                Hemos creado tu cuenta. Por favor, inicia sesión para continuar.
+                Tu cuenta ha sido creada exitosamente. Serás redirigido automáticamente...
               </p>
-              <Button onClick={() => {
-                setIsLogin(true);
-                dispatch(resetRegistrationSuccess());
-              }}
-              className="w-full"
-              >
-                Ir a Iniciar Sesión
-              </Button>
+              <div className="flex items-center justify-center">
+                <div className="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
+              </div>
             </div>
           ) : (
             <form onSubmit={handleSubmit} className="space-y-4">
@@ -133,7 +128,13 @@ const AuthPage = () => {
                 required
               />
 
-              {error && <p className="body-sm text-red-500 text-center">{error.detail || 'An error occurred'}</p>}
+              {error && (
+                <div className="bg-red-50 border border-red-200 rounded-lg p-3">
+                  <p className="body-sm text-red-700 text-center">
+                    {error.detail || error.message || 'An error occurred'}
+                  </p>
+                </div>
+              )}
 
               <Button
                 type="submit"
@@ -152,7 +153,7 @@ const AuthPage = () => {
             </form>
           )}
 
-          {!registrationSuccess && (
+          {!(registrationSuccess && !isAuthenticated) && (
             <div className="mt-6 text-center">
               <p className="body-sm text-text-secondary">
                 {isLogin ? '¿No tienes cuenta?' : '¿Ya tienes cuenta?'}

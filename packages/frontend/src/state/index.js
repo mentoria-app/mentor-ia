@@ -55,6 +55,7 @@ export {
   loginUser,
   registerUser,
   logoutUser,
+  initializeAuth,
   clearAuthError,
   resetRegistrationSuccess,
   selectUser,

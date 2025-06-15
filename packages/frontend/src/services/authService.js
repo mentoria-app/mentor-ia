@@ -42,8 +42,33 @@ export const login = async (credentials) => {
 };
 
 export const register = async (userData) => {
-    const response = await api.post('/auth/register', userData);
-    return response.data;
+    try {
+        const response = await api.post('/auth/register', userData);
+        
+        // After successful registration, automatically log the user in
+        // Clear sensitive data from memory by creating new object
+        const loginCredentials = {
+            email: userData.email,
+            password: userData.password
+        };
+        
+        const loginData = await login(loginCredentials);
+        
+        // Clear credentials from memory
+        loginCredentials.password = null;
+        delete loginCredentials.password;
+        
+        return {
+            user: response.data, // Registration response (user data)
+            ...loginData // Login response (token + updated user data from /auth/me)
+        };
+    } catch (error) {
+        // Enhanced error handling for registration flow
+        if (error.response?.status === 400) {
+            throw new Error('Registration failed. User may already exist.');
+        }
+        throw error;
+    }
 };
 
 export const logout = () => {

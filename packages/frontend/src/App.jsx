@@ -1,13 +1,19 @@
-import React, { useState } from 'react';
-import { useSelector } from 'react-redux';
+import React, { useState, useEffect } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AppLayout, ProtectedRoute } from './components/layout';
 import { AuthPage, Onboarding, MentorHub, MentorDashboard, Profile } from './pages';
-import { selectIsAuthenticated } from './state/authSlice';
+import { selectIsAuthenticated, initializeAuth } from './state/authSlice';
 
 function App() {
   const [activeTab, setActiveTab] = useState('resources');
+  const dispatch = useDispatch();
   const isAuthenticated = useSelector(selectIsAuthenticated);
+
+  // Initialize auth state on app startup
+  useEffect(() => {
+    dispatch(initializeAuth());
+  }, [dispatch]);
 
   // Component to handle default route based on auth status
   const DefaultRoute = () => {

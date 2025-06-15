@@ -3,8 +3,21 @@ import { useNavigate, useLocation, useParams } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { selectAllMentors, selectActiveMentorId, selectMentorById } from '../../state/mentorsSlice';
 
-// SVG Icons as reusable components
-const ChevronDownIcon = ({ className, isOpen }) => (
+// Constants for performance - avoid recreation
+const NAVIGATION_DELAYS = {
+  BACK: 150,
+  MENTOR_SWITCH: 200,
+  PROFILE: 150
+};
+
+const BUTTON_STYLES = {
+  BASE: "relative overflow-hidden transition-all duration-200 ease-out focus:outline-none focus:ring-2 focus:ring-primary-500/50 focus:ring-offset-1",
+  ICON: "p-2 text-text-secondary hover:text-primary hover:bg-primary-50 rounded-lg hover:scale-105 active:scale-95",
+  RIPPLE: "absolute inset-0 rounded-lg bg-primary-100 opacity-0 hover:opacity-20 transition-opacity duration-200"
+};
+
+// Memoized SVG Icons for performance
+const ChevronDownIcon = React.memo(({ className, isOpen }) => (
   <svg 
     className={`w-4 h-4 transition-all duration-300 ease-out ${isOpen ? 'rotate-180 scale-110' : ''} ${className}`}
     fill="none" 
@@ -19,9 +32,9 @@ const ChevronDownIcon = ({ className, isOpen }) => (
       d="M19 9l-7 7-7-7" 
     />
   </svg>
-);
+));
 
-const BackArrowIcon = ({ className }) => (
+const BackArrowIcon = React.memo(({ className }) => (
   <svg 
     className={`w-5 h-5 ${className}`}
     fill="none" 
@@ -36,9 +49,9 @@ const BackArrowIcon = ({ className }) => (
       d="M15 19l-7-7 7-7" 
     />
   </svg>
-);
+));
 
-const MentorIcon = ({ className }) => (
+const MentorIcon = React.memo(({ className }) => (
   <svg 
     className={`w-5 h-5 text-white ${className}`} 
     fill="none" 
@@ -53,9 +66,9 @@ const MentorIcon = ({ className }) => (
       d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" 
     />
   </svg>
-);
+));
 
-const CheckIcon = ({ className }) => (
+const CheckIcon = React.memo(({ className }) => (
   <svg 
     className={`w-4 h-4 ${className}`} 
     fill="currentColor" 
@@ -68,9 +81,9 @@ const CheckIcon = ({ className }) => (
       clipRule="evenodd" 
     />
   </svg>
-);
+));
 
-const PlusIcon = ({ className }) => (
+const PlusIcon = React.memo(({ className }) => (
   <svg 
     className={`w-4 h-4 ${className}`} 
     fill="none" 
@@ -85,7 +98,33 @@ const PlusIcon = ({ className }) => (
       d="M12 6v6m0 0v6m0-6h6m-6 0H6" 
     />
   </svg>
-);
+));
+
+const ProfileIcon = React.memo(({ isActive }) => (
+  <svg 
+    className={`w-5 h-5 transition-all duration-300 ease-out ${
+      isActive 
+        ? 'text-primary' 
+        : 'text-gray-400'
+    }`}
+    fill="currentColor"
+    viewBox="0 0 24 24"
+  >
+    {isActive ? (
+      // Filled version - exact conversion from profile-filled.svg (512x512 → 24x24)
+      <>
+        <circle cx="12" cy="6" r="6"/>
+        <path d="M12,14.0156c-4.969,0.0056-9.0089,4.0351-9,9C3,23.5508,3.4492,24,4,24h16c0.5508,0,1-0.4492,1-1C20.9911,18.0351,16.9689,14.0212,12,14.0156z"/>
+      </>
+    ) : (
+      // Outlined version - exact paths from profile.svg  
+      <>
+        <path d="M12,12A6,6,0,1,0,6,6,6.006,6.006,0,0,0,12,12ZM12,2A4,4,0,1,1,8,6,4,4,0,0,1,12,2Z"/>
+        <path d="M12,14a9.01,9.01,0,0,0-9,9,1,1,0,0,0,2,0,7,7,0,0,1,14,0,1,1,0,0,0,2,0A9.01,9.01,0,0,0,12,14Z"/>
+      </>
+    )}
+  </svg>
+));
 
 const Header = ({ title, subtitle, className = '', ...props }) => {
   const navigate = useNavigate();
@@ -106,7 +145,7 @@ const Header = ({ title, subtitle, className = '', ...props }) => {
     return 'other';
   }, [location.pathname]);
 
-  // Memoized current mentor selection
+  // Memoized current mentor selection with error handling
   const currentMentor = useSelector(state => {
     if (pageType === 'dashboard' && params.mentorId) {
       return selectMentorById(state, params.mentorId);
@@ -116,27 +155,44 @@ const Header = ({ title, subtitle, className = '', ...props }) => {
 
   // Memoized display content
   const displayContent = useMemo(() => ({
-    title: title || (currentMentor ? currentMentor.name : 'MentorIA'),
-    subtitle: subtitle || (currentMentor ? currentMentor.subject : undefined)
-  }), [title, subtitle, currentMentor]);
+    title: title || (currentMentor?.name) || 'MentorIA',
+    subtitle: subtitle || currentMentor?.subject
+  }), [title, subtitle, currentMentor?.name, currentMentor?.subject]);
+
+  // Memoized computed styles
+  const computedStyles = useMemo(() => ({
+    buttonBase: BUTTON_STYLES.BASE,
+    iconButton: `${BUTTON_STYLES.BASE} ${BUTTON_STYLES.ICON}`,
+    backButton: `${BUTTON_STYLES.BASE} ${BUTTON_STYLES.ICON} ${isNavigating ? 'scale-95 opacity-75' : ''}`,
+    profileButton: `${BUTTON_STYLES.BASE} p-2 rounded-lg hover:scale-105 active:scale-95 transition-all duration-200 hover:bg-primary-50 ${
+      isNavigating ? 'scale-95 opacity-75' : ''
+    }`
+  }), [isNavigating]);
 
   // Navigation handlers with micro-interactions
   const handleBackClick = useCallback(async () => {
+    if (isNavigating) return; // Prevent double clicks
+    
     setIsNavigating(true);
     
     // Add slight delay for visual feedback
     setTimeout(() => {
-      if (pageType === 'profile') {
-        navigate(-1);
-      } else {
-        navigate('/mentors');
+      try {
+        if (pageType === 'profile') {
+          navigate(-1);
+        } else {
+          navigate('/mentors');
+        }
+      } catch (error) {
+        console.error('Navigation error:', error);
+      } finally {
+        setIsNavigating(false);
       }
-      setIsNavigating(false);
-    }, 150);
-  }, [navigate, pageType]);
+    }, NAVIGATION_DELAYS.BACK);
+  }, [navigate, pageType, isNavigating]);
 
   const handleMentorSwitch = useCallback(async (mentorId) => {
-    if (mentorId === activeMentorId) {
+    if (mentorId === activeMentorId || isNavigating) {
       setIsDropdownOpen(false);
       return;
     }
@@ -147,21 +203,31 @@ const Header = ({ title, subtitle, className = '', ...props }) => {
     setIsDropdownOpen(false);
     
     setTimeout(() => {
-      navigate(`/mentor/${mentorId}`);
-      setIsNavigating(false);
-    }, 200);
-  }, [navigate, activeMentorId]);
+      try {
+        navigate(`/mentor/${mentorId}`);
+      } catch (error) {
+        console.error('Mentor switch error:', error);
+      } finally {
+        setIsNavigating(false);
+      }
+    }, NAVIGATION_DELAYS.MENTOR_SWITCH);
+  }, [navigate, activeMentorId, isNavigating]);
 
   const handleProfileClick = useCallback(async () => {
-    if (location.pathname === '/profile') return;
+    if (location.pathname === '/profile' || isNavigating) return;
     
     setIsNavigating(true);
     
     setTimeout(() => {
-      navigate('/profile');
-      setIsNavigating(false);
-    }, 150);
-  }, [navigate, location.pathname]);
+      try {
+        navigate('/profile');
+      } catch (error) {
+        console.error('Profile navigation error:', error);
+      } finally {
+        setIsNavigating(false);
+      }
+    }, NAVIGATION_DELAYS.PROFILE);
+  }, [navigate, location.pathname, isNavigating]);
 
   const toggleDropdown = useCallback((e) => {
     e.stopPropagation();
@@ -186,11 +252,6 @@ const Header = ({ title, subtitle, className = '', ...props }) => {
     }
   }, [isDropdownOpen, closeDropdown]);
 
-  // Shared button styles
-  const buttonBaseStyles = "relative overflow-hidden transition-all duration-200 ease-out focus:outline-none focus:ring-2 focus:ring-primary-500/50 focus:ring-offset-1";
-  const iconButtonStyles = `${buttonBaseStyles} p-2 text-text-secondary hover:text-primary hover:bg-primary-50 rounded-lg hover:scale-105 active:scale-95`;
-  const backButtonStyles = `${iconButtonStyles} ${isNavigating ? 'scale-95 opacity-75' : ''}`;
-
   // Hub Header Component
   if (pageType === 'hub') {
     return (
@@ -214,16 +275,14 @@ const Header = ({ title, subtitle, className = '', ...props }) => {
             <button 
               onClick={handleProfileClick}
               disabled={isNavigating}
-              className={`${iconButtonStyles} ${isNavigating ? 'scale-95 opacity-75' : ''}`}
+              className={computedStyles.profileButton}
               aria-label="Ir al perfil"
             >
-              <img 
-                src="/icons/profile.svg" 
-                alt="" 
-                className="w-5 h-5 transition-transform duration-200"
+              <ProfileIcon 
+                isActive={location.pathname === '/profile'}
               />
               {/* Ripple effect */}
-              <span className="absolute inset-0 rounded-lg bg-primary-100 opacity-0 hover:opacity-20 transition-opacity duration-200" />
+              <span className={BUTTON_STYLES.RIPPLE} />
             </button>
           </div>
         </div>
@@ -244,11 +303,11 @@ const Header = ({ title, subtitle, className = '', ...props }) => {
             <button
               onClick={handleBackClick}
               disabled={isNavigating}
-              className={backButtonStyles}
+              className={computedStyles.backButton}
               aria-label={pageType === 'profile' ? 'Volver' : 'Volver a Mis Mentores'}
             >
               <BackArrowIcon className="transition-transform duration-200 hover:-translate-x-0.5" />
-              <span className="absolute inset-0 rounded-lg bg-primary-100 opacity-0 hover:opacity-20 transition-opacity duration-200" />
+              <span className={BUTTON_STYLES.RIPPLE} />
             </button>
           )}
         </div>
@@ -263,7 +322,7 @@ const Header = ({ title, subtitle, className = '', ...props }) => {
                   <button
                     onClick={toggleDropdown}
                     disabled={isNavigating}
-                    className={`${buttonBaseStyles} flex items-center space-x-1 px-3 py-1.5 text-text-primary hover:text-primary hover:bg-primary-50 rounded-lg transition-all duration-200 hover:scale-105 active:scale-95 ${isDropdownOpen ? 'bg-primary-50 text-primary shadow-sm' : ''} ${isNavigating ? 'opacity-75' : ''}`}
+                    className={`${computedStyles.buttonBase} flex items-center space-x-1 px-3 py-1.5 text-text-primary hover:text-primary hover:bg-primary-50 rounded-lg transition-all duration-200 hover:scale-105 active:scale-95 ${isDropdownOpen ? 'bg-primary-50 text-primary shadow-sm' : ''} ${isNavigating ? 'opacity-75' : ''}`}
                     aria-label="Cambiar mentor"
                     aria-expanded={isDropdownOpen}
                     aria-haspopup="true"
@@ -368,15 +427,13 @@ const Header = ({ title, subtitle, className = '', ...props }) => {
           <button 
             onClick={handleProfileClick}
             disabled={isNavigating}
-            className={`${iconButtonStyles} ${isNavigating ? 'scale-95 opacity-75' : ''} ${location.pathname === '/profile' ? 'bg-primary-50 text-primary' : ''}`}
+            className={computedStyles.profileButton}
             aria-label="Ir al perfil"
           >
-            <img 
-              src="/icons/profile.svg" 
-              alt="" 
-              className="w-5 h-5 transition-transform duration-200"
+            <ProfileIcon 
+              isActive={location.pathname === '/profile'}
             />
-            <span className="absolute inset-0 rounded-lg bg-primary-100 opacity-0 hover:opacity-20 transition-opacity duration-200" />
+            <span className={BUTTON_STYLES.RIPPLE} />
           </button>
         </div>
       </div>
@@ -384,4 +441,4 @@ const Header = ({ title, subtitle, className = '', ...props }) => {
   );
 };
 
-export default Header; 
+export default React.memo(Header); 

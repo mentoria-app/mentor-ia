@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import { Card, Avatar, Button } from '../components/common';
+import { Card, Button } from '../components/common';
+import { ProfileHeader, SubscriptionCard, SettingsGroup } from '../components/profile';
 import { selectUser } from '../state/authSlice';
 import { logoutUser } from '../state/authSlice';
 
@@ -9,87 +10,100 @@ const Profile = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const user = useSelector(selectUser);
+  const [pushNotifications, setPushNotifications] = useState(true);
 
   const handleLogout = () => {
     dispatch(logoutUser());
     navigate('/auth');
   };
 
-  const settingsOptions = [
-    { id: 'notifications', title: 'Notificaciones', description: 'Gestionar alertas y recordatorios' },
-    { id: 'language', title: 'Idioma', description: 'Español' },
-    { id: 'privacy', title: 'Privacidad', description: 'Configuración de datos' },
-    { id: 'help', title: 'Ayuda y Soporte', description: 'Centro de ayuda' },
-    { id: 'about', title: 'Acerca de', description: 'Información de la app' }
-  ];
+  const handleDeleteAccount = () => {
+    // TODO: Implement delete account functionality
+    console.log('Delete account clicked');
+  };
+
+  const handleToggleNotifications = () => {
+    setPushNotifications(!pushNotifications);
+    // TODO: Save preference to backend
+  };
 
   if (!user) {
     return (
-        <div className="p-4 text-center">
-            <p>No user data available. Please log in.</p>
-            <Button onClick={() => navigate('/auth')}>Go to Login</Button>
-        </div>
+      <div className="p-4 text-center">
+        <p className="body-md text-gray-600 mb-4">No hay datos de usuario disponibles.</p>
+        <Button onClick={() => navigate('/auth')}>Ir al Login</Button>
+      </div>
     );
   }
 
   return (
-    <div className="p-4 space-y-6">
-      <Card className="p-6">
-        <div className="flex items-center space-x-4">
-          <Avatar 
-            src={user.avatar || "https://via.placeholder.com/80"} 
-            size="xl" 
-            alt={user.full_name}
-          />
-          <div className="flex-1">
-            <h2 className="heading-sm text-gray-900">{user.full_name}</h2>
-            <p className="body-md text-gray-600">{user.email}</p>
-            <p className="caption">Miembro desde {new Date(user.created_at).toLocaleDateString()}</p>
-          </div>
-        </div>
+    <div className="p-4 space-y-6 max-w-2xl mx-auto">
+      {/* Profile Header */}
+      <Card>
+        <ProfileHeader user={user} />
       </Card>
 
-      <div className="grid grid-cols-3 gap-3">
-        <Card className="p-4 text-center">
-          <div className="heading-md text-blue-600">{user.stats?.totalMentors || 0}</div>
-          <div className="caption">Mentores</div>
-        </Card>
-        <Card className="p-4 text-center">
-          <div className="heading-md text-green-600">{user.stats?.totalQuizzes || 0}</div>
-          <div className="caption">Quizzes</div>
-        </Card>
-        <Card className="p-4 text-center">
-          <div className="heading-md text-purple-600">{user.stats?.studyStreak || 0}</div>
-          <div className="caption">Días seguidos</div>
-        </Card>
-      </div>
+      {/* Subscription Card */}
+      <SubscriptionCard subscription={user.subscription} />
 
-      <div className="space-y-3">
-        <h3 className="heading-xs text-gray-900">Configuración</h3>
-        
-        {settingsOptions.map((option) => (
-          <Card key={option.id} className="p-4 hover:shadow-md transition-shadow cursor-pointer">
-            <div className="flex items-center justify-between">
-              <div>
-                <h4 className="label text-gray-900">{option.title}</h4>
-                <p className="caption">{option.description}</p>
-              </div>
-              <div className="text-gray-400">
-                →
-              </div>
+      {/* App Settings */}
+      <SettingsGroup title="Configuración de la App">
+        <Card className="p-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <h4 className="label text-gray-900">Notificaciones Push</h4>
+              <p className="caption text-gray-600">Recibir alertas y recordatorios</p>
             </div>
-          </Card>
-        ))}
-      </div>
+            <button
+              onClick={handleToggleNotifications}
+              className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${
+                pushNotifications ? 'bg-blue-600' : 'bg-gray-200'
+              }`}
+            >
+              <span
+                className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                  pushNotifications ? 'translate-x-6' : 'translate-x-1'
+                }`}
+              />
+            </button>
+          </div>
+        </Card>
+      </SettingsGroup>
 
-      <div className="pt-4">
-        <button 
-          onClick={handleLogout}
-          className="w-full bg-red-600 text-white py-3 px-4 rounded-lg button-text hover:bg-red-700 transition-colors"
-        >
-          Cerrar Sesión
-        </button>
-      </div>
+      {/* Danger Zone */}
+      <SettingsGroup title="Zona de Peligro">
+        <Card className="p-4 space-y-3">
+          <div className="flex items-center justify-between">
+            <div>
+              <h4 className="label text-gray-900">Cerrar Sesión</h4>
+              <p className="caption text-gray-600">Salir de tu cuenta actual</p>
+            </div>
+            <Button 
+              variant="secondary" 
+              size="sm"
+              onClick={handleLogout}
+            >
+              Cerrar Sesión
+            </Button>
+          </div>
+          
+          <hr className="border-gray-200" />
+          
+          <div className="flex items-center justify-between">
+            <div>
+              <h4 className="label text-red-700">Eliminar Cuenta</h4>
+              <p className="caption text-gray-600">Eliminar permanentemente tu cuenta y todos los datos</p>
+            </div>
+            <Button 
+              variant="danger" 
+              size="sm"
+              onClick={handleDeleteAccount}
+            >
+              Eliminar
+            </Button>
+          </div>
+        </Card>
+      </SettingsGroup>
     </div>
   );
 };

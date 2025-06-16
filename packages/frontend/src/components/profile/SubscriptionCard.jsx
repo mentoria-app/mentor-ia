@@ -1,8 +1,44 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import { useSelector } from 'react-redux';
 import { Card, Button } from '../common';
+import { selectUser } from '../../state/authSlice';
+import { getExtendedProfile } from '../../services/authService';
 
-const SubscriptionCard = ({ subscription = null }) => {
-  const isFreePlan = !subscription || subscription.plan === 'free';
+const SubscriptionCard = () => {
+  const user = useSelector(selectUser);
+  const [subscriptionStatus, setSubscriptionStatus] = useState('free');
+  const [loading, setLoading] = useState(true);
+  
+  useEffect(() => {
+    const fetchUserProfile = async () => {
+      try {
+        const profileData = await getExtendedProfile();
+        setSubscriptionStatus(profileData.profile?.subscription_status || 'free');
+      } catch (error) {
+        console.error('Error fetching subscription status:', error);
+        setSubscriptionStatus('free');
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    if (user) {
+      fetchUserProfile();
+    }
+  }, [user]);
+  
+  const isFreePlan = subscriptionStatus === 'free';
+  
+  if (loading) {
+    return (
+      <Card className="p-6 bg-gradient-to-r from-blue-50 to-purple-50 border-blue-200">
+        <div className="animate-pulse">
+          <div className="h-6 bg-gray-200 rounded w-32 mb-2"></div>
+          <div className="h-4 bg-gray-200 rounded w-48"></div>
+        </div>
+      </Card>
+    );
+  }
   
   return (
     <Card className="p-6 bg-gradient-to-r from-blue-50 to-purple-50 border-blue-200">
@@ -24,11 +60,6 @@ const SubscriptionCard = ({ subscription = null }) => {
               : 'Acceso completo a todas las funciones premium'
             }
           </p>
-          {!isFreePlan && subscription?.expires_at && (
-            <p className="caption text-gray-500 mt-1">
-              Renovación: {new Date(subscription.expires_at).toLocaleDateString()}
-            </p>
-          )}
         </div>
         <div className="ml-4">
           <Button 

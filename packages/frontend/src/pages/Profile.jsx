@@ -1,30 +1,67 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { Card, Button } from '../components/common';
 import { ProfileHeader, SubscriptionCard, SettingsGroup } from '../components/profile';
 import { selectUser } from '../state/authSlice';
 import { logoutUser } from '../state/authSlice';
+import { getExtendedProfile, updateUserProfile } from '../services/authService';
 
 const Profile = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const user = useSelector(selectUser);
   const [pushNotifications, setPushNotifications] = useState(true);
+  const [isUpdatingNotifications, setIsUpdatingNotifications] = useState(false);
 
-  const handleLogout = () => {
-    dispatch(logoutUser());
-    navigate('/auth');
+  // Load user preferences on component mount
+  useEffect(() => {
+    const loadUserPreferences = async () => {
+      try {
+        const profileData = await getExtendedProfile();
+        setPushNotifications(profileData.profile?.notifications_enabled ?? true);
+      } catch (error) {
+        console.error('Error loading user preferences:', error);
+      }
+    };
+
+    if (user) {
+      loadUserPreferences();
+    }
+  }, [user]);
+
+  const handleLogout = async () => {
+    try {
+      await dispatch(logoutUser()).unwrap();
+      navigate('/auth');
+    } catch (error) {
+      console.error('Logout error:', error);
+      // Still navigate even if logout fails
+      navigate('/auth');
+    }
   };
 
   const handleDeleteAccount = () => {
     // TODO: Implement delete account functionality
-    console.log('Delete account clicked');
+    if (window.confirm('¿Estás seguro de que quieres eliminar tu cuenta? Esta acción no se puede deshacer.')) {
+      console.log('Delete account clicked');
+    }
   };
 
-  const handleToggleNotifications = () => {
-    setPushNotifications(!pushNotifications);
-    // TODO: Save preference to backend
+  const handleToggleNotifications = async () => {
+    setIsUpdatingNotifications(true);
+    const newValue = !pushNotifications;
+    
+    try {
+      await updateUserProfile({ notifications_enabled: newValue });
+      setPushNotifications(newValue);
+    } catch (error) {
+      console.error('Error updating notification preference:', error);
+      // Revert the toggle on error
+      // The UI will stay as is since setPushNotifications wasn't called
+    } finally {
+      setIsUpdatingNotifications(false);
+    }
   };
 
   if (!user) {
@@ -40,11 +77,11 @@ const Profile = () => {
     <div className="p-4 space-y-6 max-w-2xl mx-auto">
       {/* Profile Header */}
       <Card>
-        <ProfileHeader user={user} />
+        <ProfileHeader />
       </Card>
 
       {/* Subscription Card */}
-      <SubscriptionCard subscription={user.subscription} />
+      <SubscriptionCard />
 
       {/* App Settings */}
       <SettingsGroup title="Configuración de la App">
@@ -56,14 +93,15 @@ const Profile = () => {
             </div>
             <button
               onClick={handleToggleNotifications}
-              className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${
+              disabled={isUpdatingNotifications}
+              className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed ${
                 pushNotifications ? 'bg-blue-600' : 'bg-gray-200'
               }`}
             >
               <span
                 className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
                   pushNotifications ? 'translate-x-6' : 'translate-x-1'
-                }`}
+                } ${isUpdatingNotifications ? 'animate-pulse' : ''}`}
               />
             </button>
           </div>

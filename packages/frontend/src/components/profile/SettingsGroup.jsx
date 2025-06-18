@@ -1,10 +1,19 @@
 import React from 'react';
 
-const SettingsGroup = ({ title, children, className = "" }) => {
+const SettingsGroup = ({ title, children, className = "", isDanger = false }) => {
   return (
-    <div className={`space-y-3 ${className}`}>
-      <h3 className="heading-xs text-gray-900 font-semibold">{title}</h3>
-      <div className="space-y-2">
+    <div className={`space-y-4 ${className}`}>
+      {/* Section Header */}
+      <div className="px-1">
+        <h2 className={`text-lg font-semibold ${
+          isDanger ? 'text-red-700' : 'text-gray-900'
+        }`}>
+          {title}
+        </h2>
+      </div>
+      
+      {/* Section Content */}
+      <div className="space-y-3">
         {children}
       </div>
     </div>
